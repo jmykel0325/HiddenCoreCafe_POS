@@ -1,0 +1,234 @@
+.select2-container .select2-selection--single {
+    height: 38px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px !important;
+}
+
+:root {
+    --hc-primary: #000000;
+    --hc-secondary: #1A1A1A;
+    --hc-bg: #FFFFFF;
+    --hc-card: #F5F5F5;
+    --hc-border: #E0E0E0;
+    --hc-subtext: #555555;
+}
+
+body {
+    background-color: var(--hc-bg) !important;
+    color: var(--hc-primary) !important;
+}
+
+#layoutSidenav,
+#layoutSidenav_content,
+#layoutSidenav_content main {
+    background-color: var(--hc-bg) !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--hc-primary) !important;
+}
+
+.text-muted {
+    color: var(--hc-subtext) !important;
+}
+
+.sb-topnav.navbar {
+    background-color: var(--hc-bg) !important;
+    border-bottom: 1px solid var(--hc-border) !important;
+}
+
+.sb-sidenav {
+    background-color: var(--hc-bg) !important;
+    border-right: 1px solid var(--hc-border) !important;
+}
+
+.sb-sidenav-light {
+    background-color: var(--hc-bg) !important;
+    color: var(--hc-primary) !important;
+}
+
+.sb-topnav.navbar-light #sidebarToggle {
+    color: var(--hc-primary) !important;
+}
+
+.sb-sidenav .sb-sidenav-menu-heading,
+.sb-sidenav .nav-link,
+.sb-sidenav .sb-nav-link-icon i,
+.sb-topnav .navbar-nav .nav-link,
+.sb-topnav .navbar-nav .nav-link i {
+    color: var(--hc-primary) !important;
+}
+
+.sb-sidenav .nav-link:hover,
+.sb-sidenav .sb-sidenav-menu-nested .nav-link:hover {
+    background-color: var(--hc-card) !important;
+    color: var(--hc-primary) !important;
+}
+
+.sb-sidenav .nav-link.active,
+.sb-sidenav .nav-link.active .sb-nav-link-icon i {
+    background-color: var(--hc-primary) !important;
+    color: #FFFFFF !important;
+}
+
+.sb-sidenav .nav-link.active .sb-sidenav-collapse-arrow i {
+    color: #FFFFFF !important;
+}
+
+.card {
+    background-color: var(--hc-card) !important;
+    border: 1px solid var(--hc-border) !important;
+}
+
+.card-header {
+    background-color: var(--hc-bg) !important;
+    border-bottom: 1px solid var(--hc-border) !important;
+    color: var(--hc-primary) !important;
+}
+
+.btn-primary,
+.btn.btn-primary {
+    background-color: var(--hc-primary) !important;
+    border-color: var(--hc-primary) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-primary:hover,
+.btn.btn-primary:hover {
+    background-color: var(--hc-secondary) !important;
+    border-color: var(--hc-secondary) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-secondary,
+.btn.btn-secondary {
+    background-color: var(--hc-secondary) !important;
+    border-color: var(--hc-secondary) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-secondary:hover,
+.btn.btn-secondary:hover {
+    background-color: var(--hc-primary) !important;
+    border-color: var(--hc-primary) !important;
+    color: #FFFFFF !important;
+}
+
+.form-control,
+.form-select,
+.select2-container--default .select2-selection--single {
+    border-color: var(--hc-border) !important;
+}
+
+table.beige-table,
+table.beige-table th,
+table.beige-table td {
+    background-color: var(--hc-card) !important;
+    color: var(--hc-primary) !important;
+    border-color: var(--hc-border) !important;
+}
+
+table.beige-table thead th {
+    background-color: var(--hc-bg) !important;
+}
+
+table.beige-table tbody tr:hover {
+    background-color: var(--hc-bg) !important;
+}
+
+.product-card,
+.order-card,
+.report-card,
+.dashboard-card {
+    background-color: var(--hc-card) !important;
+    border-color: var(--hc-border) !important;
+}
+
+.product-name,
+.order-title,
+.report-title,
+.dashboard-title,
+.report-value,
+.dashboard-value {
+    color: var(--hc-primary) !important;
+}
+
+.product-category {
+    color: var(--hc-subtext) !important;
+}
+
+.incdec-btn {
+    background: var(--hc-bg) !important;
+    border: 1px solid var(--hc-border) !important;
+    color: var(--hc-primary) !important;
+    box-shadow: none !important;
+}
+
+.incdec-btn:hover,
+.incdec-btn:focus {
+    background: var(--hc-secondary) !important;
+    border-color: var(--hc-secondary) !important;
+    color: #FFFFFF !important;
+}
+
+.beige-card {
+    background-color: var(--hc-card) !important;
+    color: var(--hc-primary) !important;
+    border: 1px solid var(--hc-border) !important;
+}
+
+.beige-card-header {
+    background-color: var(--hc-bg) !important;
+    color: var(--hc-primary) !important;
+    border-bottom: 1px solid var(--hc-border) !important;
+}
+
+.list-group-item {
+    background-color: var(--hc-bg) !important;
+    color: var(--hc-primary) !important;
+    border-color: var(--hc-border) !important;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--hc-bg) !important;
+    color: var(--hc-primary) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--hc-secondary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.08) !important;
+}
+
+.btn-success,
+.btn-danger {
+    background-color: var(--hc-primary) !important;
+    border-color: var(--hc-primary) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-success:hover,
+.btn-danger:hover {
+    background-color: var(--hc-secondary) !important;
+    border-color: var(--hc-secondary) !important;
+    color: #FFFFFF !important;
+}
+
+.quantityInput {
+    border: 1px solid var(--hc-border) !important;
+}
+
+.quantityInput {
+    width: 50px !important;
+    padding: 6px 3px;
+    text-align: center;
+    border: 1px solid var(--hc-border);
+    outline: 0;
+    margin-right: 1px;
+}

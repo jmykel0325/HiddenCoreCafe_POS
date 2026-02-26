@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8f1e3;
+            margin: 0;
+            padding: 0;
+        }
+        .api-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(140, 115, 85, 0.10);
+            padding: 32px 36px 28px 36px;
+            position: relative;
+        }
+        h2 {
+            color: #8c7355;
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+        }
+        label {
+            color: #5a4a42;
+            font-weight: 500;
+            margin-top: 12px;
+            display: block;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #a97d5d;
+            border-radius: 7px;
+            background: #f0e7db;
+            color: #3b2f2f;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: #8c7355;
+            background: #fff;
+            outline: none;
+        }
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+        button {
+            background: #8c7355;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 10px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(140, 115, 85, 0.08);
+        }
+        button:hover {
+            background: #fff;
+            color: #8c7355;
+            border: 1px solid #8c7355;
+        }
+        h3 {
+            color: #5a4a42;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .response-container {
+            background: #f0e7db;
+            color: #3b2f2f;
+            border-radius: 7px;
+            padding: 18px;
+            font-size: 1rem;
+            min-height: 60px;
+            max-height: 350px;
+            overflow: auto;
+            box-shadow: 0 1px 4px rgba(140, 115, 85, 0.07);
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .json-key {
+            color: #8c7355;
+        }
+        .json-string {
+            color: #a97d5d;
+        }
+        .json-number {
+            color: #3b2f2f;
+        }
+        .json-boolean {
+            color: #00796b;
+            font-weight: bold;
+        }
+        .json-null {
+            color: #b71c1c;
+            font-style: italic;
+        }
+        .fa-database {
+            color: #a97d5d;
+            margin-right: 8px;
+        }
+        .inline-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .inline-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+        }
+       
+        .dashboard-btn {
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 10;
+        }
+        .dashboard-btn i {
+            font-size: 1.7rem;
+            color: #8c7355;
+            transition: color 0.2s;
+        }
+        .dashboard-btn:hover i {
+            color: #a97d5d;
+        }
+        @media (max-width: 700px) {
+            .api-container {
+                padding: 18px 8px 18px 8px;
+            }
+            .dashboard-btn {
+                left: 8px;
+                top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="api-container">
+        
+        <a href="/Kopikuys/admin/assets/dashboard.php" class="dashboard-btn" title="Go to Dashboard">
+            <i class="fas fa-home"></i>
+        </a>
+       
+
+        <h2><i class="fas fa-database"></i>API TESTER</h2>
+        <form id="apiForm">
+            <label>Table:
+                <select id="table">
+                    <option value="products">products</option>
+                    <option value="orders">orders</option>
+                    <option value="order_items">order_items</option>
+                    <option value="categories">categories</option>
+                    <option value="cashier_staff">cashier_staff</option>
+                </select>
+            </label>
+            <div class="inline-checkbox">
+                <input type="checkbox" id="getAll" checked>
+                <label for="getAll" style="margin:0; font-weight:400;">Get all items in table</label>
+            </div>
+            <label>ID (optional):
+                <input type="text" id="id" placeholder="Record ID for GET/PUT/DELETE" disabled>
+            </label>
+            <label>Method:
+                <select id="method">
+                    <option>GET</option>
+                    <option>POST</option>
+                    <option>PUT</option>
+                    <option>DELETE</option>
+                </select>
+            </label>
+            <label>Data (JSON for POST/PUT):
+                <textarea id="data" placeholder='{"name":"Coffee","price":100}'>{}</textarea>
+            </label>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
+        </form>
+        <h3>Response:</h3>
+        <div id="response" class="response-container"></div>
+    </div>
+    <script>
+        const getAllCheckbox = document.getElementById('getAll');
+        const idInput = document.getElementById('id');
+        getAllCheckbox.addEventListener('change', function() {
+            idInput.disabled = this.checked;
+            if(this.checked) idInput.value = '';
+        });
+
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d*)?([eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        document.getElementById('apiForm').onsubmit = async function(e) {
+            e.preventDefault();
+            let table = document.getElementById('table').value;
+            let id = document.getElementById('id').value;
+            let method = document.getElementById('method').value;
+            let data = document.getElementById('data').value;
+            let getAll = document.getElementById('getAll').checked;
+            let url = `api.php?table=${encodeURIComponent(table)}`;
+            if(!getAll && id) url += `&id=${encodeURIComponent(id)}`;
+            let opts = { method };
+            if(method === 'POST' || method === 'PUT') {
+                opts.headers = { 'Content-Type': 'application/json' };
+                opts.body = data;
+            }
+            let res = await fetch(url, opts);
+            let text = await res.text();
+            let responseDiv = document.getElementById('response');
+            try {
+                let json = JSON.parse(text);
+                responseDiv.innerHTML = syntaxHighlight(json);
+            } catch {
+                responseDiv.textContent = text;
+            }
+        }
+    </script>
+</body>
+</html>

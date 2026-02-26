@@ -1,0 +1,11 @@
+# Exclude secrets and sensitive files
+config/dbcon.php
+
+# Exclude the other SQL dump (only keep kopikuys (4).sql)
+kopikuys (5).sql
+
+# Exclude temporary/cache files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
