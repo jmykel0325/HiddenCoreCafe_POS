@@ -5,11 +5,11 @@
     </button>
 
     <a class="navbar-brand ps-3 d-flex align-items-center" href="dashboard.php" style="font-weight: bold;">
-        <img src="/Kopikuys/LOGO.jpg" alt="Hidden Core Logo" style="width: 60px; height: 60px; margin-right: 0px;" />
+        <img src="/HiddenCoreCafe/LOGO.jpg" alt="Hidden Core Logo" style="width: 60px; height: 60px; margin-right: 0px;" />
     </a>
 
     <ul class="navbar-nav ms-auto">
-          <a href="/Kopikuys/API/api-tester.html" class="btn btn-link ms-3" title="API Tester">
+          <a href="/HiddenCoreCafe/API/api-tester.html" class="btn btn-link ms-3" title="API Tester">
             <i class="fas fa-plug" style="font-size: 1.6rem;"></i>
             </a>
         <li class="nav-item dropdown">

@@ -39,12 +39,12 @@ $data = [
     'data' => [
         'attributes' => [
             'amount' => $total_amount * 100, // Amount in cents
-            'description' => 'Payment for Kopikuys Order',
-            'statement_descriptor' => 'Kopikuys',
+            'description' => 'Payment for Hidden Core Cafe Order',
+            'statement_descriptor' => 'Hidden Core Cafe',
             'currency' => 'PHP',
             'redirect' => [
-                'success' => 'http://' . $_SERVER['HTTP_HOST'] . '/Kopikuys/admin/assets/paymongo-payment-success.php',
-                'failed' => 'http://' . $_SERVER['HTTP_HOST'] . '/Kopikuys/admin/assets/orders-create.php?payment=failed',
+                'success' => 'http://' . $_SERVER['HTTP_HOST'] . '/HiddenCoreCafe/admin/assets/paymongo-payment-success.php',
+                'failed' => 'http://' . $_SERVER['HTTP_HOST'] . '/HiddenCoreCafe/admin/assets/orders-create.php?payment=failed',
             ],
             'type' => 'gcash', // You can change this to other types like 'paymaya', 'card'
         ],

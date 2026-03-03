@@ -1,56 +1,121 @@
 <?php include('includes/header.php'); ?>
 
 <style>
-   body {
-    background: #FFFFFF url('admin/assets/img/cover.jpg') no-repeat center center fixed;
+  body {
+    background: #FFFFFF url('login_bg.png') no-repeat center center fixed;
     background-size: cover;
     font-family: Arial, sans-serif;
-}
+  }
 
-.container {
-        background:rgba(255, 255, 255, 0.92);
-        border: 1px solid #E0E0E0;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        text-align: center;
-}
-
-.brand-container {
+  .home-hero {
+    min-height: calc(100vh - 80px);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
+    align-items: flex-start;
+    padding: 2.5rem 1.5rem;
+  }
 
-.brand-container img {
-    width: 400px; 
-    height: auto;
-}
+  .home-hero .container {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
 
-.btn-primary {
+  .home-hero .row {
+    margin-left: 0;
+  }
+
+  .home-hero .col-lg-5,
+  .home-hero .col-md-6 {
+    padding-left: 0;
+  }
+
+  .menu-carousel-card {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     background-color: #000000;
-    border-color: #000000;
-}
+    max-width: 420px;
+    transition: transform 0.6s ease, box-shadow 0.6s ease;
+    animation: floatCard 8s ease-in-out infinite;
+  }
 
-.btn-primary:hover {
-    background-color: #1A1A1A;
-    color: #FFFFFF;
-    border-color: #1A1A1A;
-}
+  .menu-carousel-card img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+  }
+
+  #menuCarousel .carousel-item img {
+    transition: transform 0.8s ease, opacity 0.8s ease;
+  }
+
+  #menuCarousel .carousel-item.active img {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+
+  #menuCarousel .carousel-item:not(.active) img {
+    opacity: 0.7;
+  }
+
+  .menu-carousel-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);
+  }
+
+  @keyframes floatCard {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 </style>
 
-<div class="py-5">
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="brand-container">
-                    <img src="LOGO.jpg" alt="Hidden Core Logo">
-                </div>
-                <a href="login.php" class="btn btn-primary mt-0">Login</a>
+<section class="home-hero">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 col-md-6">
+        <div class="menu-carousel-card">
+          <div id="menuCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-touch="true">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu1.jpg" alt="Hidden Core Cafe menu 1">
+              </div>
+              <div class="carousel-item">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu2.jpg" alt="Hidden Core Cafe menu 2">
+              </div>
+              <div class="carousel-item">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu3.jpg" alt="Hidden Core Cafe menu 3">
+              </div>
+              <div class="carousel-item">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu4.jpg" alt="Hidden Core Cafe menu 4">
+              </div>
+              <div class="carousel-item">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu5.jpg" alt="Hidden Core Cafe menu 5">
+              </div>
+              <div class="carousel-item">
+                <img src="/HiddenCoreCafe/admin/assets/img/menu6.jpg" alt="Hidden Core Cafe menu 6">
+              </div>
             </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#menuCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#menuCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
 <?php include('includes/footer.php'); ?>

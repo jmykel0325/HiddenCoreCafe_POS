@@ -137,7 +137,7 @@ if (insert('orders', $orderData)) {
             <img src="https://1000logos.net/wp-content/uploads/2023/05/GCash-Logo.png" alt="GCash Logo" class="logo">
             <p>You have paid</p>
             <h2 class="amount">PHP <?= number_format($total_amount, 2) ?></h2>
-            <p>to Kopikuys</p>
+            <p>to Hidden Core Cafe</p>
         </div>
         <div class="receipt-body">
             <h5>Payment Successful</h5>
@@ -148,7 +148,7 @@ if (insert('orders', $orderData)) {
                 </tr>
                 <tr>
                     <td>Merchant</td>
-                    <td>Kopikuys</td>
+                    <td>Hidden Core Cafe</td>
                 </tr>
                 <tr>
                     <td>Amount</td>

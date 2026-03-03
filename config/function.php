@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require 'dbcon.php';
+require_once __DIR__ . '/dbcon.php';
 
 if(!function_exists('validate')){
     function validate($inputData){

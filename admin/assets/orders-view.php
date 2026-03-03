@@ -89,8 +89,8 @@ $order_date = date("F j, Y h:i A", strtotime($order['created_at']));
     <div id="receipt">
         <div class="receipt-container">
             <div class="receipt-header">
-                <img src="img/bg2.jpg" alt="Kopikuys Logo">
-                <h4 style="margin: 0;">Kopikuys</h4>
+                <img src="img/bg2.jpg" alt="Hidden Core Cafe Logo">
+                <h4 style="margin: 0;">Hidden Core Cafe</h4>
                 <p style="margin: 0;">Roxas East Ave., 9500 General Santos City, Philippines</p>
                 <hr>
                 <p>Invoice #: <?= $invoice_number ?></p>

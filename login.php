@@ -52,7 +52,7 @@ if(isset($_SESSION['loggedIn'])){
     <div class="card">
         <?php alertMessage(); ?>
 
-        <h4 class="text-dark mb-3">Login to Kopikuys</h4>
+        <h4 class="text-dark mb-3">Login to Hidden Core Cafe</h4>
         <form action="login-code.php" method="POST">
             <div class="mb-3">
                 <label>Enter Username</label>

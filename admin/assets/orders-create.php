@@ -361,7 +361,7 @@ include('includes/header.php'); ?>
                             </div>
                             <div class="gcash-details">
                                 <p class="amount">₱<span id="gcashTotal">0.00</span></p>
-                                <p>Kopikuys</p>
+                                <p>Hidden Core Cafe</p>
                             </div>
                             <div class="mb-3">
                                 <label for="gcash-number" class="form-label small text-muted">Your GCash Number</label>

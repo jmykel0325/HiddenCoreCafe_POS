@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2025 at 12:19 PM
+-- Generation Time: Mar 03, 2026 at 05:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -17,8 +17,8 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Database: `kopikuys`
+
+-- Database: `HiddenCoreCafe`
 --
 
 -- --------------------------------------------------------
@@ -45,7 +45,7 @@ CREATE TABLE `cashier_staff` (
 
 INSERT INTO `cashier_staff` (`id`, `first_name`, `middle_name`, `last_name`, `email`, `username`, `password`, `position`, `created_at`) VALUES
 (1, 'User', 'User', 'User', 'Kopikuys@gmail.com', 'Kopikuys', '$2y$10$kDuHHqwwkWaN8tPMF32da.x4bdwS3..mmiAk8ukGssQ3EyqEjPWqa', 'Owner', '2025-03-12 14:03:27'),
-(2, 'Nicole', 'Berdera', 'Bayani', 'nicolebayani110@gmail.com', 'Nics', '$2y$10$ml5I1pwlMqZhqWrrSL5bGuUuTzJ8ExeOx9m5ABlJUeLzccFY53L4O', 'Cashier', '2025-05-21 09:42:53');
+(2, 'John Michael', 'Rodrigo', 'Castillo', 'jmykel1342@gmail.com', 'jmykel1342', '$2y$10$V1tIMS4vZzQlujxQhpm0DuXYyZ2dLYpAYEURmwegxu1dZstX.CRR6', 'Cashier', '2025-05-21 09:42:53');
 
 -- --------------------------------------------------------
 
@@ -190,18 +190,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `category_id`, `name`, `price`, `quantity`, `image`, `created_at`, `status`) VALUES
-(18, 1, 'Iced Coffee Latte', 39, 2, 'assets/upload/products/1744813101.jpg', '2025-04-16', 0),
-(19, 1, 'Caramel Macchiato', 39, 2, 'assets/upload/products/1744813154.jpg', '2025-04-16', 0),
-(20, 1, 'Spanish Latte', 39, 3, 'assets/upload/products/1744813197.jpg', '2025-04-16', 0),
-(21, 1, 'Matcha Latte', 39, 1, 'assets/upload/products/1744813212.jpg', '2025-04-16', 0),
-(22, 2, 'Milky Matcha', 39, 2, 'assets/upload/products/1744813255.jpg', '2025-04-16', 0),
-(23, 2, 'Milky Strawberry', 39, 1, 'assets/upload/products/1744813276.jpg', '2025-04-16', 0),
-(24, 2, 'Milky Ube', 39, 4, 'assets/upload/products/1744813298.jpg', '2025-04-16', 0),
-(25, 3, 'White Choco-ey', 39, 2, 'assets/upload/products/1744813342.jpg', '2025-04-16', 0),
-(26, 3, 'Dark Choco-ey', 39, 4, 'assets/upload/products/1744813366.jpg', '2025-04-16', 0),
-(27, 4, 'Cookies and Cream', 39, 4, 'assets/upload/products/1744813409.jpg', '2025-04-16', 0),
-(28, 4, 'Java Chip', 39, 2, 'assets/upload/products/1744813450.jpg', '2025-04-16', 0),
-(29, 4, 'Rocky Road', 39, 4, 'assets/upload/products/1744813467.jpg', '2025-04-16', 0);
+(29, 1, 'Rocky Road', 39, 100, 'assets/upload/products/1772121363.png', '2025-04-16', 0);
 
 --
 -- Indexes for dumped tables
