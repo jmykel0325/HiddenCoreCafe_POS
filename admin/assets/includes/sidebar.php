@@ -1,7 +1,36 @@
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+        <?php
+            $isStaff = (($_SESSION['loggedInUser']['role'] ?? '') === 'staff');
+            $homeLink = $isStaff ? 'orders-create.php' : 'dashboard.php';
+        ?>
+        <div class="hc-sidebar-brand">
+            <div class="hc-sidebar-brand">
+                <a href="<?= $homeLink ?>" class="hc-brand-link">
+                    <span class="hc-brand-logo">
+                        <img src="/HiddenCoreCafe_POS/LOGO.jpg" alt="Hidden Core Cafe logo" />
+                    </span>
+                    <span class="hc-brand-text">
+                        <span class="hc-brand-title">Hidden</span>
+                        <span class="hc-brand-title">Core</span>
+                        <span class="hc-brand-subtitle">Cafe</span>
+                    </span>
+                </a>
+            </div>
+        </div>
         <div class="sb-sidenav-menu">
-            <div class="nav">
+            <div class="nav hc-nav">
+                <?php if ($isStaff): ?>
+                <div class="sb-sidenav-menu-heading">Cashiering</div>
+                <a class="nav-link" href="orders-create.php">
+                    <div class="sb-nav-link-icon"><i class="fas fa-cash-register"></i></div>
+                    Cashiering Order
+                </a>
+                <a class="nav-link" href="orders.php">
+                    <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    View Orders
+                </a>
+                <?php else: ?>
                 <div class="sb-sidenav-menu-heading">Main</div>
                 <a class="nav-link" href="dashboard.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-dashboard"></i></div>
@@ -69,6 +98,23 @@
                 <div class="collapse" id="collapseSales" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="sales-report.php">View Sales</a>
+                    </nav>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <!-- Account section at bottom -->
+        <div class="sb-sidenav-footer">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Account</div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAccount" aria-expanded="false" aria-controls="collapseAccount">
+                    <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
+                    <?= $_SESSION['loggedInUser']['username']; ?>
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseAccount" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="../../logout.php">Logout</a>
                     </nav>
                 </div>
             </div>

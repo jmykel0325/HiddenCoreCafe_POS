@@ -23,10 +23,9 @@ require 'authentication.php';
         <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
         <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
         <link href="css/custom.css" rel="stylesheet" />
+        <link href="css/hc-admin-theme.css" rel="stylesheet" />
 </head>
-<body class="sb-nav-fixed">
-
-    <?php include('navbar.php') ?>
+<body class="sb-nav-fixed hc-admin">
 
     <div id="layoutSidenav">
 

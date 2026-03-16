@@ -1,8 +1,9 @@
-<nav class="navbar navbar-expand-lg bg-light shadow">
+<nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
     
-    <a class="navbar-brand" href="/HiddenCoreCafe/admin/assets/dashboard.php" style="font-weight: bold;">
-      <img src="/HiddenCoreCafe/LOGO.jpg" alt="Hidden Core Logo" style="height: 40px; width: auto;" />
+    <a class="navbar-brand d-flex align-items-center gap-3" href="/HiddenCoreCafe_POS/index.php" style="font-weight: 700; color: #0f172a;">
+      <img src="/HiddenCoreCafe_POS/LOGO.jpg" alt="Hidden Core Logo" style="height: 40px; width: auto; border-radius: 12px;" />
+      <span>Hidden Core Cafe</span>
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,7 +27,7 @@
         </li>
         <?php else: ?>
         <li class="nav-item">
-          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+          <a class="nav-link" href="login.php">Login</a>
         </li>
         <?php endif; ?>
       </ul>

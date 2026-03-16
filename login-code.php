@@ -23,11 +23,19 @@ if(isset($_POST['loginBtn'])){
                 }
 
                 $_SESSION['loggedIn'] = true;
+                $position = strtolower(trim((string)($row['position'] ?? '')));
+                $role = ($position === 'cashier' || $position === 'staff') ? 'staff' : 'admin';
                 $_SESSION['loggedInUser'] = [
                     'user_id' => $row['id'],
                     'username' => $row['username'],
+                    'position' => $row['position'],
+                    'role' => $role,
 
                 ];
+
+                if ($role === 'staff') {
+                    redirect('admin/assets/orders-create.php', 'Logged In Successfully.');
+                }
 
                 redirect('admin/assets/dashboard.php','Logged In Successfully.');
 

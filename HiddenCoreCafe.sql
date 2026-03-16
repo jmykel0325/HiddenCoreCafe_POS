@@ -124,6 +124,7 @@ CREATE TABLE `order_items` (
   `order_id` int(11) NOT NULL,
   `product_name` varchar(100) NOT NULL,
   `category` varchar(100) NOT NULL,
+  `size` varchar(20) NOT NULL DEFAULT '12oz',
   `quantity` int(11) NOT NULL,
   `price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -132,41 +133,41 @@ CREATE TABLE `order_items` (
 -- Dumping data for table `order_items`
 --
 
-INSERT INTO `order_items` (`id`, `order_id`, `product_name`, `category`, `quantity`, `price`) VALUES
-(32, 24, 'Iced Coffee Latte', '', 1, 39.00),
-(33, 24, 'Cookies and Cream', '', 1, 39.00),
-(34, 25, 'Milky Strawberry', '', 1, 39.00),
-(35, 26, 'Milky Matcha', '', 1, 39.00),
-(36, 27, 'Spanish Latte', '', 1, 39.00),
-(37, 27, 'Milky Ube', '', 1, 39.00),
-(38, 27, 'Dark Choco-ey', '', 1, 39.00),
-(39, 28, 'Caramel Macchiato', '', 1, 39.00),
-(40, 29, 'Milky Matcha', '', 1, 39.00),
-(41, 29, 'White Choco-ey', '', 1, 39.00),
-(42, 29, 'Cookies and Cream', '', 1, 39.00),
-(43, 29, 'Java Chip', '', 1, 39.00),
-(44, 30, 'Iced Coffee Latte', '', 1, 39.00),
-(45, 30, 'Matcha Latte', '', 1, 39.00),
-(46, 30, 'Milky Strawberry', '', 1, 39.00),
-(47, 30, 'White Choco-ey', '', 1, 39.00),
-(48, 30, 'Dark Choco-ey', '', 1, 39.00),
-(49, 30, 'Java Chip', '', 1, 39.00),
-(50, 31, 'Java Chip', '', 1, 39.00),
-(53, 37, 'Spanish Latte', 'Coffee Series', 1, 39.00),
-(54, 38, 'Spanish Latte', 'Coffee Series', 1, 39.00),
-(55, 39, 'Caramel Macchiato', 'Coffee Series', 1, 39.00),
-(56, 40, 'Iced Coffee Latte', 'Coffee Series', 1, 39.00),
-(57, 41, 'Milky Strawberry', 'Non-Coffee Series', 1, 39.00),
-(58, 41, 'Milky Ube', 'Non-Coffee Series', 1, 39.00),
-(63, 44, 'Rocky Road', 'Rookie Series', 1, 39.00),
-(64, 45, 'Iced Coffee Latte', 'Coffee Series', 1, 39.00),
-(65, 45, 'Caramel Macchiato', 'Coffee Series', 1, 39.00),
-(66, 46, 'Milky Matcha', 'Non-Coffee Series', 2, 39.00),
-(67, 46, 'Milky Strawberry', 'Non-Coffee Series', 1, 39.00),
-(68, 47, 'Matcha Latte', 'Coffee Series', 1, 39.00),
-(69, 47, 'Milky Matcha', 'Non-Coffee Series', 1, 39.00),
-(70, 47, 'Milky Strawberry', 'Non-Coffee Series', 1, 39.00),
-(71, 47, 'White Choco-ey', 'Choco-Ey Series', 1, 39.00);
+INSERT INTO `order_items` (`id`, `order_id`, `product_name`, `category`, `size`, `quantity`, `price`) VALUES
+(32, 24, 'Iced Coffee Latte', '', '12oz', 1, 39.00),
+(33, 24, 'Cookies and Cream', '', '12oz', 1, 39.00),
+(34, 25, 'Milky Strawberry', '', '12oz', 1, 39.00),
+(35, 26, 'Milky Matcha', '', '12oz', 1, 39.00),
+(36, 27, 'Spanish Latte', '', '12oz', 1, 39.00),
+(37, 27, 'Milky Ube', '', '12oz', 1, 39.00),
+(38, 27, 'Dark Choco-ey', '', '12oz', 1, 39.00),
+(39, 28, 'Caramel Macchiato', '', '12oz', 1, 39.00),
+(40, 29, 'Milky Matcha', '', '12oz', 1, 39.00),
+(41, 29, 'White Choco-ey', '', '12oz', 1, 39.00),
+(42, 29, 'Cookies and Cream', '', '12oz', 1, 39.00),
+(43, 29, 'Java Chip', '', '12oz', 1, 39.00),
+(44, 30, 'Iced Coffee Latte', '', '12oz', 1, 39.00),
+(45, 30, 'Matcha Latte', '', '12oz', 1, 39.00),
+(46, 30, 'Milky Strawberry', '', '12oz', 1, 39.00),
+(47, 30, 'White Choco-ey', '', '12oz', 1, 39.00),
+(48, 30, 'Dark Choco-ey', '', '12oz', 1, 39.00),
+(49, 30, 'Java Chip', '', '12oz', 1, 39.00),
+(50, 31, 'Java Chip', '', '12oz', 1, 39.00),
+(53, 37, 'Spanish Latte', 'Coffee Series', '12oz', 1, 39.00),
+(54, 38, 'Spanish Latte', 'Coffee Series', '12oz', 1, 39.00),
+(55, 39, 'Caramel Macchiato', 'Coffee Series', '12oz', 1, 39.00),
+(56, 40, 'Iced Coffee Latte', 'Coffee Series', '12oz', 1, 39.00),
+(57, 41, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
+(58, 41, 'Milky Ube', 'Non-Coffee Series', '12oz', 1, 39.00),
+(63, 44, 'Rocky Road', 'Rookie Series', '12oz', 1, 39.00),
+(64, 45, 'Iced Coffee Latte', 'Coffee Series', '12oz', 1, 39.00),
+(65, 45, 'Caramel Macchiato', 'Coffee Series', '12oz', 1, 39.00),
+(66, 46, 'Milky Matcha', 'Non-Coffee Series', '12oz', 2, 39.00),
+(67, 46, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
+(68, 47, 'Matcha Latte', 'Coffee Series', '12oz', 1, 39.00),
+(69, 47, 'Milky Matcha', 'Non-Coffee Series', '12oz', 1, 39.00),
+(70, 47, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
+(71, 47, 'White Choco-ey', 'Choco-Ey Series', '12oz', 1, 39.00);
 
 -- --------------------------------------------------------
 
@@ -178,6 +179,9 @@ CREATE TABLE `products` (
   `id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `name` varchar(225) NOT NULL,
+  `size` enum('12oz','16oz') NOT NULL DEFAULT '12oz',
+  `price_12oz` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `price_16oz` decimal(10,2) NOT NULL DEFAULT 0.00,
   `price` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `image` varchar(225) NOT NULL,
@@ -189,8 +193,8 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `category_id`, `name`, `price`, `quantity`, `image`, `created_at`, `status`) VALUES
-(29, 1, 'Rocky Road', 39, 100, 'assets/upload/products/1772121363.png', '2025-04-16', 0);
+INSERT INTO `products` (`id`, `category_id`, `name`, `size`, `price_12oz`, `price_16oz`, `price`, `quantity`, `image`, `created_at`, `status`) VALUES
+(29, 1, 'Rocky Road', '12oz', 39.00, 49.00, 39, 100, 'assets/upload/products/1772121363.png', '2025-04-16', 0);
 
 --
 -- Indexes for dumped tables

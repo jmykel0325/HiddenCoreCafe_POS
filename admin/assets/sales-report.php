@@ -5,38 +5,6 @@ include('includes/header.php');
 include('../../config/dbcon.php');
 ?>
 
-<style>
-    .report-card {
-        background-color: #F5F5F5;
-        border: 1px solid #E0E0E0;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    .report-title {
-        font-size: 1.5rem;
-        color: #000000;
-        margin-bottom: 10px;
-    }
-    .report-value {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #000000;
-    }
-    @media (max-width: 767.98px) {
-        .report-card {
-            padding: 12px;
-        }
-        .report-title {
-            font-size: 1.1rem;
-        }
-        .report-value {
-            font-size: 1.3rem;
-        }
-    }
-</style>
-
 <div class="container-fluid px-2 px-md-4">
     <div class="card mt-4 shadow-sm">
         <div class="card-header">

@@ -1,42 +1,5 @@
 <?php include ('includes/header.php'); ?>
 
-<style>
-    .beige-table {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-    .beige-table th {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-    .beige-table td {
-        background-color: #F5F5F5;
-    }
-    .beige-table tbody tr:hover {
-        background-color: #FFFFFF;
-    }
-    .card-header {
-        background-color: #FFFFFF !important;
-        color: #000000;
-    }
-    .btn-primary {
-        background-color: #000000;
-        border-color: #000000;
-    }
-    .btn-primary:hover {
-        background-color:#1A1A1A;
-        color: #FFFFFF;
-    }
-    .btn-success {
-        background-color: #000000;
-        border-color: #000000;
-    }
-    .btn-danger {
-        background-color: #000000;
-        border-color: #000000;
-    }
-</style>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="container-fluid px-4">
@@ -73,6 +36,10 @@
                     </thead>
                     <tbody>
                         <?php foreach($cashier_staff as $cashier_staffItem) :?>
+                        <?php
+                            $isSelf = ((int)($_SESSION['loggedInUser']['user_id'] ?? 0) === (int)$cashier_staffItem['id']);
+                            $isSelfOwner = $isSelf && (strcasecmp((string)$cashier_staffItem['position'], 'Owner') === 0);
+                        ?>
                         <tr>
                             <td><?= $cashier_staffItem['first_name'] ?></td>
                             <td><?= $cashier_staffItem['middle_name'] ?></td>
@@ -82,7 +49,11 @@
                             <td><?= $cashier_staffItem['position'] ?></td>
                             <td>
                                 <a href="cashier_staff-edit.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-success btn-sm">Edit</a>
-                                <a href="cashier_staff-delete.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                <?php if($isSelfOwner): ?>
+                                    <button type="button" class="btn btn-danger btn-sm" disabled title="Owner cannot delete own account">Delete</button>
+                                <?php else: ?>
+                                    <a href="cashier_staff-delete.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

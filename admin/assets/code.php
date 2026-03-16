@@ -2,18 +2,88 @@
 
 include('../../config/function.php');
 
+if(!function_exists('ensureProductsSizeColumn')){
+    function ensureProductsSizeColumn($conn){
+        static $checked = false;
+        static $available = false;
+
+        if ($checked) {
+            return $available;
+        }
+
+        $checked = true;
+        $checkResult = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'size'");
+        if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+            $available = true;
+            return true;
+        }
+
+        $alterResult = mysqli_query($conn, "ALTER TABLE products ADD COLUMN size ENUM('12oz','16oz') NOT NULL DEFAULT '12oz' AFTER name");
+        if ($alterResult) {
+            $available = true;
+        }
+
+        return $available;
+    }
+}
+
+if(!function_exists('ensureProductsSizePriceColumns')){
+    function ensureProductsSizePriceColumns($conn){
+        static $checked = false;
+        static $available = false;
+
+        if ($checked) {
+            return $available;
+        }
+
+        $checked = true;
+        $has12 = false;
+        $has16 = false;
+
+        $check12 = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'price_12oz'");
+        if ($check12 && mysqli_num_rows($check12) > 0) {
+            $has12 = true;
+        }
+
+        $check16 = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'price_16oz'");
+        if ($check16 && mysqli_num_rows($check16) > 0) {
+            $has16 = true;
+        }
+
+        if (!$has12) {
+            mysqli_query($conn, "ALTER TABLE products ADD COLUMN price_12oz DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER size");
+        }
+
+        if (!$has16) {
+            mysqli_query($conn, "ALTER TABLE products ADD COLUMN price_16oz DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER price_12oz");
+        }
+
+        $verify12 = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'price_12oz'");
+        $verify16 = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'price_16oz'");
+        $available = ($verify12 && mysqli_num_rows($verify12) > 0) && ($verify16 && mysqli_num_rows($verify16) > 0);
+
+        return $available;
+    }
+}
+
 if(isset($_POST['SaveCashier/Staff'])){
-    if (!empty($_POST['first_name']) && !empty($_POST['middle_name']) && !empty($_POST['last_name']) 
+    if (!empty($_POST['first_name']) && !empty($_POST['last_name']) 
         && !empty($_POST['email']) && !empty($_POST['username']) && !empty($_POST['password']) 
         && !empty($_POST['position'])) {
 
         $first_name = validate($_POST['first_name']);
-        $middle_name = validate($_POST['middle_name']);
+        $middle_name = validate($_POST['middle_name'] ?? '');
         $last_name = validate($_POST['last_name']);
         $email = validate($_POST['email']);
         $username = validate($_POST['username']);
         $password = validate($_POST['password']);
         $position = validate($_POST['position']);
+        $allowedPositions = ['Cashier', 'Staff', 'Owner'];
+
+        if (!in_array($position, $allowedPositions, true)) {
+            redirect('admins-create.php', 'Invalid position selected.');
+            exit;
+        }
 
         // Check if username already exists
         $usernameCheck = mysqli_query($conn, "SELECT * FROM cashier_staff WHERE username='$username'");
@@ -48,7 +118,7 @@ if(isset($_POST['SaveCashier/Staff'])){
 
 
 if(isset($_POST['updateCashier/Staff'])){ 
-    if (!empty($_POST['adminId']) && !empty($_POST['first_name']) && !empty($_POST['middle_name']) 
+    if (!empty($_POST['adminId']) && !empty($_POST['first_name']) 
         && !empty($_POST['last_name']) && !empty($_POST['email']) && !empty($_POST['username']) 
         && !empty($_POST['position'])) {
 
@@ -60,12 +130,25 @@ if(isset($_POST['updateCashier/Staff'])){
         }
 
         $first_name = validate($_POST['first_name']);
-        $middle_name = validate($_POST['middle_name']);
+        $middle_name = validate($_POST['middle_name'] ?? '');
         $last_name = validate($_POST['last_name']);
         $email = validate($_POST['email']);
         $username = validate($_POST['username']);
-        $password = validate($_POST['password']);
+        $password = validate($_POST['password'] ?? '');
         $position = validate($_POST['position']);
+        $allowedPositions = ['Cashier', 'Staff', 'Owner'];
+
+        if (!in_array($position, $allowedPositions, true)) {
+            redirect('cashier_staff-edit.php?id='.$adminId, 'Invalid position selected.');
+            exit;
+        }
+
+        $isSelfUpdate = isset($_SESSION['loggedInUser']['user_id']) && (int)$_SESSION['loggedInUser']['user_id'] === (int)$adminId;
+        $currentPosition = trim((string)($adminData['data']['position'] ?? ''));
+        if ($isSelfUpdate && strcasecmp($currentPosition, 'Owner') === 0) {
+            // Prevent owner from changing their own role/position.
+            $position = $currentPosition;
+        }
         
         if($password != ''){
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -86,6 +169,10 @@ if(isset($_POST['updateCashier/Staff'])){
         $result = update('cashier_staff', $adminId, $data);
 
         if($result){
+            if ($isSelfUpdate) {
+                $_SESSION['loggedInUser']['username'] = $username;
+                $_SESSION['loggedInUser']['position'] = $position;
+            }
             redirect('cashier_staff-edit.php?id='.$adminId, 'Cashier/Staff Updated Successfully'); 
         } else {
             redirect('cashier_staff-edit.php?id='.$adminId, 'Something Went Wrong!');
@@ -142,11 +229,15 @@ if(isset($_POST['saveProduct']))
 {
     $category_id = validate($_POST['category_id']);
     $name = validate($_POST['name']);
-   
-
-    $price = validate($_POST['price']);
+    $price_12oz = validate($_POST['price_12oz'] ?? '');
+    $price_16oz = validate($_POST['price_16oz'] ?? '');
     $quantity = validate($_POST['quantity']);
     $status = isset($_POST['status']) == true ? 1:0;
+
+    if ($price_12oz === '' || $price_16oz === '') {
+        redirect('products-create.php', 'Please provide both 12oz and 16oz prices.');
+        exit;
+    }
 
     if(isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK)
     {
@@ -173,13 +264,20 @@ if(isset($_POST['saveProduct']))
 
     $data = [
         'category_id' =>  $category_id,
-        'name' => $name,			
-        
-        'price' => $price,
+        'name' => $name,
+        'size' => '12oz',
+        'price' => $price_12oz,
+
         'quantity' => $quantity,
         'image' => $finalImage,
         'status' => $status
     ];
+
+    if (ensureProductsSizeColumn($conn) && ensureProductsSizePriceColumns($conn)) {
+        $data['price_12oz'] = $price_12oz;
+        $data['price_16oz'] = $price_16oz;
+    }
+
     $result = insert('products', $data);
 
     if($result){
@@ -200,11 +298,15 @@ if(isset($_POST['updateProduct']))
 
     $category_id = validate($_POST['category_id']); 
     $name = validate($_POST['name']);
-    
-
-    $price = validate($_POST['price']);
+    $price_12oz = validate($_POST['price_12oz'] ?? '');
+    $price_16oz = validate($_POST['price_16oz'] ?? '');
     $quantity = validate($_POST['quantity']);
     $status = isset($_POST['status']) == true ? 1:0;
+
+    if ($price_12oz === '' || $price_16oz === '') {
+        redirect('products-edit.php?id='.$product_id, 'Please provide both 12oz and 16oz prices.');
+        exit;
+    }
 
     if(isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK)
     {
@@ -240,13 +342,19 @@ if(isset($_POST['updateProduct']))
 
     $data = [
         'category_id' =>  $category_id,
-        'name' => $name,			
+        'name' => $name,
+        'size' => '12oz',
+        'price' => $price_12oz,
     
-        'price' => $price,
         'quantity' => $quantity,
         'image' => $finalImage,
         'status' => $status
     ];
+
+    if (ensureProductsSizeColumn($conn) && ensureProductsSizePriceColumns($conn)) {
+        $data['price_12oz'] = $price_12oz;
+        $data['price_16oz'] = $price_16oz;
+    }
 
     $result = update ('products',$product_id, $data);
 

@@ -51,7 +51,15 @@ $data = [
     ],
 ];
 
-$secret_key = PAYMONGO_SECRET_KEY;
+$secret_key = defined('PAYMONGO_SECRET_KEY') ? trim((string) PAYMONGO_SECRET_KEY) : trim((string) getenv('PAYMONGO_SECRET_KEY'));
+if (
+    $secret_key === '' ||
+    str_contains($secret_key, 'replace_with') ||
+    str_contains($secret_key, 'actual_paymongo_secret_key')
+) {
+    redirect('orders-create.php', 'PayMongo is not configured. Add your real PAYMONGO_SECRET_KEY in config/dbcon.php before using GCash payments.');
+}
+
 $encoded_key = base64_encode($secret_key);
 
 $ch = curl_init('https://api.paymongo.com/v1/sources');

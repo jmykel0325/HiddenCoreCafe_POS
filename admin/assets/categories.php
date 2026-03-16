@@ -1,42 +1,5 @@
 <?php include ('includes/header.php'); ?>
 
-<style>
-    .beige-table {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-    .beige-table th {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-    .beige-table td {
-        background-color: #F5F5F5;
-    }
-    .beige-table tbody tr:hover {
-        background-color: #FFFFFF;
-    }
-    .card-header {
-        background-color: #FFFFFF !important;
-        color: #000000;
-    }
-    .btn-primary {
-        background-color: #000000;
-        border-color: #000000;
-    }
-    .btn-primary:hover {
-        background-color:#1A1A1A;
-        color: #FFFFFF;
-    }
-    .btn-success {
-        background-color: #000000;
-        border-color: #000000;
-    }
-    .btn-danger {
-        background-color: #000000;
-        border-color: #000000;
-    }
-</style>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="container-fluid px-4">

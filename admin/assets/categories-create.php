@@ -1,43 +1,5 @@
 <?php include ('includes/header.php'); ?>
 
-<style>
-    .beige-card {;
-        background-color:rgb(255, 255, 255); 
-        color:rgb(0, 0, 0);
-    }
-    .beige-card-header {
-        background-color: #d9c8b4 !important; 
-        color: #3b2f2f; 
-    }
-    .form-control {
-        background-color: #f8f1e3; 
-        border: 1px solid #3b2f2f;
-        color: #a0896b;
-    }
-    .form-control:focus {
-        background-color:rgb(255, 255, 255); 
-        border-color: #a0896b;
-        box-shadow: 0 0 5px rgba(160, 137, 107, 0.5);
-    }
-    .btn-primary {
-        background-color: #8c7355;
-        border-color: #a97d5d;
-    }
-    .btn-primary:hover {
-        background-color:rgb(255, 255, 255);
-        color: #8c7355;
-    }
-    .btn-secondary {
-        background-color: #8c7355;
-        border-color: #a97d5d;
-    }
-    .container-fluid {
-        border-radius: 25px;
-        background-color:rgb(255, 255, 255); 
-        padding: 20px;
-    }
-</style>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="container-fluid px-4">

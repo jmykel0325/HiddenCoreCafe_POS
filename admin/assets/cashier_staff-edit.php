@@ -1,51 +1,15 @@
 <?php include ('includes/header.php'); ?>
 
-<style>
-    .beige-card {
-        background-color:rgb(255, 255, 255); 
-        color:rgb(0, 0, 0);
-    }
-    .beige-card-header {
-        background-color: #d9c8b4 !important; 
-        color: #3b2f2f; 
-    }
-    .form-control {
-        background-color: #f8f1e3; 
-        border: 1px solid #3b2f2f;
-        color: #a0896b;
-    }
-    .form-control:focus {
-        background-color:rgb(255, 255, 255); 
-        border-color: #a0896b;
-        box-shadow: 0 0 5px rgba(160, 137, 107, 0.5);
-    }
-    .btn-primary {
-        background-color: #8c7355;
-        border-color: #a97d5d;
-    }
-    .btn-primary:hover {
-        background-color:rgb(255, 255, 255);
-        color: #8c7355;
-    }
-    .btn-secondary {
-        background-color: #8c7355;
-        border-color: #a97d5d;
-    }
-    .container-fluid {
-        background-color:rgb(255, 255, 255); 
-        padding: 20px;
-    }
-</style>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="container-fluid px-4">
     <div class="card mt-4 shadow-sm beige-card">
-        <div class="card-header beige-card-header">
-            <h4 class="mb-0">
-                <i class="fas fa-cash-register"></i> Edit Cashier/Staff
-                <a href="admins.php" class="btn btn-secondary float-end"> Back </a>
+        <div class="card-header beige-card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 d-flex align-items-center gap-2">
+                <i class="fas fa-cash-register"></i>
+                <span>Edit Cashier/Staff</span>
             </h4>
+            <a href="admins.php" class="btn btn-secondary">Back</a>
         </div>
         <div class="card-body">
             <?php alertMessage(); ?>
@@ -71,39 +35,52 @@
                      if($adminData){
                         
                         if($adminData['status']== 200){
+                            $isSelfOwnerEdit = ((int)($_SESSION['loggedInUser']['user_id'] ?? 0) === (int)$adminData['data']['id'])
+                                && (strcasecmp((string)$adminData['data']['position'], 'Owner') === 0);
                             ?>
                             <input type="hidden" name="adminId" value="<?= $adminData['data']['id']; ?>" >
+                            <?php if($isSelfOwnerEdit): ?>
+                                <input type="hidden" name="position" value="<?= htmlspecialchars($adminData['data']['position']) ?>">
+                            <?php endif; ?>
 
-                            <div class="row">
-                <div class="col-md-8 mb-3">
-                        <label for="">First Name *</label>
-                        <input type="text" name="first name" required class="form-control" />
+                            <div class="row g-3">
+                <div class="col-md-6">
+                        <label class="form-label mb-1">First Name *</label>
+                        <input type="text" name="first_name" value="<?= htmlspecialchars($adminData['data']['first_name']) ?>" required class="form-control" />
                     </div>
-                <div class="col-md-8 mb-3">
-                        <label for="">Middle Name </label>
-                        <input type="text" name="middle name"  class="form-control" />
+                <div class="col-md-6">
+                        <label class="form-label mb-1">Middle Name</label>
+                        <input type="text" name="middle_name" value="<?= htmlspecialchars($adminData['data']['middle_name']) ?>" class="form-control" />
                     </div>
-                <div class="col-md-8 mb-3">
-                        <label for="">Last Name *</label>
-                        <input type="text" name="last name" required class="form-control" />
+                <div class="col-md-6">
+                        <label class="form-label mb-1">Last Name *</label>
+                        <input type="text" name="last_name" value="<?= htmlspecialchars($adminData['data']['last_name']) ?>" required class="form-control" />
                     </div>
-                    <div class="col-md-8 mb-3">
-                        <label for="">Email *</label>
-                        <input type="email" name="email" required class="form-control" />
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Email *</label>
+                        <input type="email" name="email" value="<?= htmlspecialchars($adminData['data']['email']) ?>" required class="form-control" />
                     </div>
-                    <div class="col-md-8 mb-3">
-                        <label for="">Username *</label>
-                        <input type="text" name="username" required class="form-control" />
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Username *</label>
+                        <input type="text" name="username" value="<?= htmlspecialchars($adminData['data']['username']) ?>" required class="form-control" />
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="">Password *</label>
-                        <input type="password" name="password" required class="form-control" />
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Password</label>
+                        <input type="password" name="password" class="form-control" />
+                        <small class="text-muted">Leave blank to keep current password.</small>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="">Position *</label>
-                        <input type="text" name="position" required class="form-control" />
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Position *</label>
+                        <select name="position" required class="form-select" <?= $isSelfOwnerEdit ? 'disabled' : '' ?>>
+                            <option value="Cashier" <?= ($adminData['data']['position'] === 'Cashier') ? 'selected' : '' ?>>Cashier</option>
+                            <option value="Staff" <?= ($adminData['data']['position'] === 'Staff') ? 'selected' : '' ?>>Staff</option>
+                            <option value="Owner" <?= ($adminData['data']['position'] === 'Owner') ? 'selected' : '' ?>>Owner</option>
+                        </select>
+                        <?php if($isSelfOwnerEdit): ?>
+                            <small class="text-muted">Owner cannot change their own position.</small>
+                        <?php endif; ?>
                     </div>
-                                <div class="col-md-12 mb-3 text-end">
+                                <div class="col-12 d-flex justify-content-end mt-2">
                                     <button type="submit" name="updateCashier/Staff" class="btn btn-primary">Update</button>
                                 </div>
                             </div>

@@ -4,14 +4,67 @@
 include('includes/header.php'); 
 include('../../config/dbcon.php');
 
+if (!function_exists('ensureOrderItemsSizeColumn')) {
+    function ensureOrderItemsSizeColumn($conn) {
+        static $checked = false;
+        static $available = false;
+
+        if ($checked) {
+            return $available;
+        }
+
+        $checked = true;
+        $checkResult = mysqli_query($conn, "SHOW COLUMNS FROM order_items LIKE 'size'");
+        if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+            $available = true;
+            return true;
+        }
+
+        $alterResult = mysqli_query($conn, "ALTER TABLE order_items ADD COLUMN size VARCHAR(20) NOT NULL DEFAULT '12oz' AFTER category");
+        if ($alterResult) {
+            $available = true;
+        }
+
+        return $available;
+    }
+}
+
 if (isset($_POST['place_order'])) {
     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
     $payment_mode = mysqli_real_escape_string($conn, $_POST['payment_mode']);
     $products = $_POST['products'];
 
     $total = 0;
+    $normalizedProducts = [];
     foreach ($products as $p) {
-        $total += $p['quantity'] * $p['price']; // Calculate total based on quantity and price
+        $prod_id = intval($p['id']);
+        $qty = max(1, intval($p['quantity']));
+        $size = isset($p['size']) && $p['size'] === '16oz' ? '16oz' : '12oz';
+
+        $productResult = mysqli_query($conn, "SELECT name, price, price_12oz, price_16oz FROM products WHERE id = $prod_id LIMIT 1");
+        if (!$productResult || mysqli_num_rows($productResult) === 0) {
+            continue;
+        }
+
+        $productRow = mysqli_fetch_assoc($productResult);
+        $price12 = isset($productRow['price_12oz']) ? (float)$productRow['price_12oz'] : (float)$productRow['price'];
+        $price16 = isset($productRow['price_16oz']) ? (float)$productRow['price_16oz'] : (float)$productRow['price'];
+        $unitPrice = $size === '16oz' ? $price16 : $price12;
+
+        $normalizedProducts[] = [
+            'id' => $prod_id,
+            'quantity' => $qty,
+            'size' => $size,
+            'price' => $unitPrice,
+            'name' => $productRow['name'] ?? ($p['name'] ?? '')
+        ];
+        $total += $qty * $unitPrice;
+    }
+
+    if (empty($normalizedProducts)) {
+        echo "<script>alert('No valid products found in order.'); window.location.href='orders-create.php';</script>";
+        include('includes/footer.php');
+        exit;
     }
 
     if ($payment_mode === 'Cash') {
@@ -27,16 +80,23 @@ if (isset($_POST['place_order'])) {
     if (mysqli_query($conn, $order_query)) {
         $order_id = mysqli_insert_id($conn); // Get the last inserted order ID
 
-        foreach ($products as $p) {
-            $prod_id = intval($p['id']);
-            $qty = intval($p['quantity']);
-            $price = floatval($p['price']);
-            $product_name = mysqli_real_escape_string($conn, $p['name']);
+        $hasOrderItemSize = ensureOrderItemsSizeColumn($conn);
+        foreach ($normalizedProducts as $p) {
+            $prod_id = (int)$p['id'];
+            $qty = (int)$p['quantity'];
+            $price = (float)$p['price'];
+            $size = mysqli_real_escape_string($conn, (string)$p['size']);
+            $product_name = mysqli_real_escape_string($conn, (string)$p['name']);
             $category = isset($p['category']) ? mysqli_real_escape_string($conn, $p['category']) : '';
 
             // Insert each product into the order_items table
-            $item_query = "INSERT INTO order_items (order_id, product_name, category, quantity, price)
-                        VALUES ('$order_id', '$product_name', '$category', '$qty', '$price')";
+            if ($hasOrderItemSize) {
+                $item_query = "INSERT INTO order_items (order_id, product_name, category, size, quantity, price)
+                            VALUES ('$order_id', '$product_name', '$category', '$size', '$qty', '$price')";
+            } else {
+                $item_query = "INSERT INTO order_items (order_id, product_name, category, quantity, price)
+                            VALUES ('$order_id', '$product_name', '$category', '$qty', '$price')";
+            }
             mysqli_query($conn, $item_query);
 
             // Update the product quantity in the products table

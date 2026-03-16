@@ -1,5 +1,12 @@
 <?php
+include('../../config/function.php');
 include('../../config/dbcon.php');
+
+$loggedInRole = $_SESSION['loggedInUser']['role'] ?? '';
+if ($loggedInRole === 'staff') {
+    header("Location: orders.php?error=forbidden");
+    exit();
+}
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: orders.php?error=invalid_id");
