@@ -1493,9 +1493,14 @@ img[src*="Logo.jpg"]{
 }
 
 .hc-category-chip.active{
-  color:#ff6a00;
-  border-color:#ff8e4c;
-  box-shadow:0 16px 28px rgba(255,106,0,.14);
+  color:#ffffff;
+  border-color:transparent;
+  background:linear-gradient(90deg, #ff6a00 0%, #ff3448 100%);
+  box-shadow:0 12px 22px rgba(255,90,40,.24);
+}
+
+.hc-category-chip.active .hc-category-chip-count{
+  color:rgba(255,255,255,.92);
 }
 
 .hc-category-chip-count{
