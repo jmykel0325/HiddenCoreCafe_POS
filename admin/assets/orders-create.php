@@ -162,9 +162,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                             <label for="paymentMode" class="hc-order-label">Payment Mode</label>
                             <select name="payment_mode" class="form-select" id="paymentMode" required>
                                 <option value="Cash">Cash</option>
-                                <?php if ($paymongoEnabled): ?>
-                                    <option value="PayMongo">GCash</option>
-                                <?php endif; ?>
+                                <option value="GCash">GCash</option>
                             </select>
                         </div>
 
@@ -187,9 +185,10 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                                     <p class="amount">&#8369;<span id="gcashTotal">0.00</span></p>
                                     <p>Hidden Core Cafe</p>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="gcash-number" class="form-label small text-muted">Your GCash Number</label>
-                                    <input type="text" class="form-control text-center" id="gcash-number" value="09534921530" readonly>
+                                <div class="text-center mb-3">
+                                    <img src="img/gcash-qr.jpg" alt="GCash QR Code" style="max-width: 200px; border-radius: 8px; border: 1px solid #ddd;">
+                                    <p class="mt-2 mb-0 fw-bold text-primary">09497836057</p>
+                                    <p class="small text-muted">Scan to pay with GCash</p>
                                 </div>
                                 <p class="small text-muted mb-0">You will be redirected to complete your payment securely.</p>
                             </div>
@@ -344,6 +343,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
         }
         document.getElementById('grandTotal').textContent = total.toFixed(2);
         document.getElementById('orderSubtotal').textContent = total.toFixed(2);
+        document.getElementById('gcashTotal').textContent = total.toFixed(2);
         attachQtyListeners();
         attachRemoveListeners();
         attachIncDecListeners();
@@ -498,11 +498,11 @@ $paymongoEnabled = $paymongoSecretKey !== ''
 
         if (paymentMode.value === 'Cash') {
             cashGivenContainer.style.display = '';
-        } else if (paymongoEnabled && paymentMode.value === 'PayMongo') {
+        } else if (paymentMode.value === 'GCash') {
             paymongoContainer.style.display = '';
         }
 
-        if (paymongoEnabled && paymentMode.value === 'PayMongo') {
+        if (paymentMode.value === 'GCash') {
             placeOrderBtn.textContent = 'Pay with GCash';
             gcashTotalSpan.textContent = total.toFixed(2);
         } else {
@@ -542,13 +542,6 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     updatePaymentMethodView();
 
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        if (paymongoEnabled && paymentMode.value === 'PayMongo') {
-            e.preventDefault();
-            this.action = 'paymongo-create-source.php';
-            this.submit();
-            return;
-        }
-
         if (paymentMode.value === 'Cash') {
             const total = parseFloat(grandTotalSpan.textContent.replace(/,/g, '')) || 0;
             const cash = parseFloat(cashGivenInput.value) || 0;
@@ -574,7 +567,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             productQtyMap[p.id] += p.quantity;
         }
         for (const productId in productQtyMap) {
-            const card = document.querySelector('.product-card[data-id="' + productId + '"]');
+            const card = document.querySelector('.product-card[data-id="' + productId + '"');
             if (!card) continue;
             const maxQty = parseInt(card.dataset.quantity);
             if (productQtyMap[productId] > maxQty) {
