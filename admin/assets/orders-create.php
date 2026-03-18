@@ -194,6 +194,11 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                             </div>
                         </div>
 
+                        <div class="hc-order-panel-section" id="gcashReferenceContainer" style="display:none;">
+                            <label for="gcashReference" class="hc-order-label">GCash Reference Number</label>
+                            <input type="text" name="gcash_reference" id="gcashReference" class="form-control" placeholder="Enter GCash reference number">
+                        </div>
+
                         <div class="hc-order-panel-section hc-order-panel-section-items">
                             <div class="hc-order-items-heading">Your order:</div>
                             <div id="selectedProducts" class="hc-checkout-items">
@@ -488,6 +493,8 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     const changeDueInput = document.getElementById('changeDueInput');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
     const gcashTotalSpan = document.getElementById('gcashTotal');
+    const gcashReferenceContainer = document.getElementById('gcashReferenceContainer');
+    const gcashReferenceInput = document.getElementById('gcashReference');
     const paymongoEnabled = <?= $paymongoEnabled ? 'true' : 'false' ?>;
 
     function updatePaymentMethodView() {
@@ -495,11 +502,15 @@ $paymongoEnabled = $paymongoSecretKey !== ''
 
         cashGivenContainer.style.display = 'none';
         paymongoContainer.style.display = 'none';
+        gcashReferenceContainer.style.display = 'none';
+        gcashReferenceInput.required = false;
 
         if (paymentMode.value === 'Cash') {
             cashGivenContainer.style.display = '';
         } else if (paymentMode.value === 'GCash') {
             paymongoContainer.style.display = '';
+            gcashReferenceContainer.style.display = '';
+            gcashReferenceInput.required = true;
         }
 
         if (paymentMode.value === 'GCash') {
@@ -513,6 +524,10 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             changeDisplay.style.display = 'none';
             cashGivenInput.value = '';
             changeDueInput.value = '0.00';
+        }
+
+        if (paymentMode.value !== 'GCash') {
+            gcashReferenceInput.value = '';
         }
     }
 
@@ -550,6 +565,13 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                 cashGivenInput.focus();
                 e.preventDefault();
             }
+        }
+
+        if (paymentMode.value === 'GCash' && gcashReferenceInput.value.trim() === '') {
+            showNotif('Please enter the GCash reference number.', '#d9534f');
+            gcashReferenceInput.focus();
+            e.preventDefault();
+            return false;
         }
 
         for (const lineKey in selectedProducts) {

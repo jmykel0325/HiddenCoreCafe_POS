@@ -100,6 +100,9 @@ $order_date = date("F j, Y h:i A", strtotime($order['created_at']));
 
             <p><strong>Customer:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
             <p><strong>Payment Mode:</strong> <?= ucfirst($order['payment_mode']) ?></p>
+            <?php if (strtolower($order['payment_mode']) === 'gcash' && isset($order['gcash_reference']) && trim((string)$order['gcash_reference']) !== ''): ?>
+                <p><strong>GCash Reference #:</strong> <?= htmlspecialchars($order['gcash_reference']) ?></p>
+            <?php endif; ?>
             <p><strong>Status:</strong> Placed</p>
             
 

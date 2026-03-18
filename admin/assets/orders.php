@@ -44,6 +44,12 @@
                                         <span class="hc-order-meta-label">Payment</span>
                                         <span class="hc-order-meta-value"><?= ucfirst($order['payment_mode']) ?></span>
                                     </div>
+                                    <?php if ($order['payment_mode'] === 'GCash' && isset($order['gcash_reference']) && trim((string)$order['gcash_reference']) !== ''): ?>
+                                        <div class="hc-order-meta-row">
+                                            <span class="hc-order-meta-label">Reference #</span>
+                                            <span class="hc-order-meta-value"><?= htmlspecialchars($order['gcash_reference']) ?></span>
+                                        </div>
+                                    <?php endif; ?>
                                     <?php if ($order['payment_mode'] === 'Cash'): ?>
                                         <div class="hc-order-meta-row">
                                             <span class="hc-order-meta-label">Cash</span>

@@ -29,9 +29,36 @@ if (!function_exists('ensureOrderItemsSizeColumn')) {
     }
 }
 
+if (!function_exists('ensureOrdersGcashReferenceColumn')) {
+    function ensureOrdersGcashReferenceColumn($conn) {
+        static $checked = false;
+        static $available = false;
+
+        if ($checked) {
+            return $available;
+        }
+
+        $checked = true;
+        $checkResult = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'gcash_reference'");
+        if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+            $available = true;
+            return true;
+        }
+
+        $alterResult = mysqli_query($conn, "ALTER TABLE orders ADD COLUMN gcash_reference VARCHAR(100) NULL AFTER payment_mode");
+        if ($alterResult) {
+            $available = true;
+        }
+
+        return $available;
+    }
+}
+
 if (isset($_POST['place_order'])) {
     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
     $payment_mode = mysqli_real_escape_string($conn, $_POST['payment_mode']);
+    $gcash_reference = isset($_POST['gcash_reference']) ? trim((string)$_POST['gcash_reference']) : '';
+    $gcash_reference_escaped = mysqli_real_escape_string($conn, $gcash_reference);
     $products = $_POST['products'];
 
     $total = 0;
@@ -67,14 +94,32 @@ if (isset($_POST['place_order'])) {
         exit;
     }
 
+    $hasGcashReferenceColumn = ensureOrdersGcashReferenceColumn($conn);
+
     if ($payment_mode === 'Cash') {
         $cash_received = isset($_POST['cash_received']) ? floatval($_POST['cash_received']) : 0;
         $change_due = $cash_received - $total;
-        $order_query = "INSERT INTO orders (customer_name, payment_mode, total, cash_received, change_due) 
-                        VALUES ('$customer_name', '$payment_mode', '$total', '$cash_received', '$change_due')";
+        if ($hasGcashReferenceColumn) {
+            $order_query = "INSERT INTO orders (customer_name, payment_mode, gcash_reference, total, cash_received, change_due) 
+                            VALUES ('$customer_name', '$payment_mode', NULL, '$total', '$cash_received', '$change_due')";
+        } else {
+            $order_query = "INSERT INTO orders (customer_name, payment_mode, total, cash_received, change_due) 
+                            VALUES ('$customer_name', '$payment_mode', '$total', '$cash_received', '$change_due')";
+        }
     } else { // For GCash or other non-cash methods
-        $order_query = "INSERT INTO orders (customer_name, payment_mode, total) 
-                        VALUES ('$customer_name', '$payment_mode', '$total')";
+        if ($gcash_reference === '') {
+            echo "<script>alert('GCash reference number is required.'); window.location.href='orders-create.php';</script>";
+            include('includes/footer.php');
+            exit;
+        }
+
+        if ($hasGcashReferenceColumn) {
+            $order_query = "INSERT INTO orders (customer_name, payment_mode, gcash_reference, total) 
+                            VALUES ('$customer_name', '$payment_mode', '$gcash_reference_escaped', '$total')";
+        } else {
+            $order_query = "INSERT INTO orders (customer_name, payment_mode, total) 
+                            VALUES ('$customer_name', '$payment_mode', '$total')";
+        }
     }
 
     if (mysqli_query($conn, $order_query)) {
