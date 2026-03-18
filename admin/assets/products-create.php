@@ -60,49 +60,75 @@
 <style>
 
   .status-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 999px;
+    background: #f8f9fb;
+    user-select: none;
     cursor: pointer;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  }
+
+  .status-container:hover {
+    border-color: #b8bec8;
+    background: #f2f4f7;
+  }
+
+  .status-container:focus-within {
+    border-color: #2f6df6;
+    box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.18);
   }
 
   .status-checkbox {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
   }
 
   .custom-checkbox {
-    width: 40px;
-    height: 20px;
-    background-color: green;
-    border-radius: 20px;
+    width: 38px;
+    height: 22px;
+    background-color: #16a34a;
+    border-radius: 999px;
     position: relative;
-    transition: 0.3s;
+    transition: background-color .2s ease;
+    flex-shrink: 0;
   }
 
   .custom-checkbox::before {
     content: "";
-    width: 18px;
-    height: 18px;
-    background-color: white;
+    width: 16px;
+    height: 16px;
+    background-color: #ffffff;
     border-radius: 50%;
     position: absolute;
-    top: 1px;
-    left: 2px;
-    transition: 0.3s;
+    top: 3px;
+    left: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform .2s ease;
   }
 
   .status-checkbox:checked + .custom-checkbox {
-    background-color:rgb(201, 22, 22);
+    background-color: #dc2626;
   }
 
   .status-checkbox:checked + .custom-checkbox::before {
-    transform: translateX(20px);
+    transform: translateX(16px);
   }
 
   .status-label {
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1;
+    color: #475569;
   }
 </style>
 

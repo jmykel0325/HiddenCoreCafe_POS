@@ -32,6 +32,7 @@ $categories = [];
 $categoryNames = [];
 $categoryCounts = [];
 $totalProductCount = 0;
+ensureProductsDeletedAtColumn();
 
 $categoriesResult = getAll('categories');
 if ($categoriesResult && mysqli_num_rows($categoriesResult) > 0) {
@@ -41,21 +42,21 @@ if ($categoriesResult && mysqli_num_rows($categoriesResult) > 0) {
     }
 }
 
-$categoryCountResult = mysqli_query($conn, "SELECT category_id, COUNT(*) AS total FROM products GROUP BY category_id");
+$categoryCountResult = mysqli_query($conn, "SELECT category_id, COUNT(*) AS total FROM products WHERE deleted_at IS NULL GROUP BY category_id");
 if ($categoryCountResult) {
     while ($countRow = mysqli_fetch_assoc($categoryCountResult)) {
         $categoryCounts[(int) $countRow['category_id']] = (int) $countRow['total'];
     }
 }
 
-$totalCountResult = mysqli_query($conn, "SELECT COUNT(*) AS total FROM products");
+$totalCountResult = mysqli_query($conn, "SELECT COUNT(*) AS total FROM products WHERE deleted_at IS NULL");
 if ($totalCountResult) {
     $totalCountRow = mysqli_fetch_assoc($totalCountResult);
     $totalProductCount = (int) ($totalCountRow['total'] ?? 0);
 }
 
 if ($selectedCategoryId !== null) {
-    $products = mysqli_query($conn, "SELECT * FROM products WHERE category_id = {$selectedCategoryId}");
+    $products = mysqli_query($conn, "SELECT * FROM products WHERE category_id = {$selectedCategoryId} AND deleted_at IS NULL");
 } else {
     $products = getAll('products');
 }

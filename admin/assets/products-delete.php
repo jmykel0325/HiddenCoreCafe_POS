@@ -1,6 +1,7 @@
 <?php
 
 require '../../config/function.php';
+ensureProductsDeletedAtColumn();
 
 $paraRestultId = isset($_GET['id']) ? $_GET['id'] : null;
 if(is_numeric($paraRestultId)){
@@ -11,15 +12,10 @@ if(is_numeric($paraRestultId)){
 
     if($product['status'] == 200){
 
-        $response = delete('products', $productId);
+        $response = mysqli_query($conn, "UPDATE products SET deleted_at = NOW() WHERE id = '$productId' LIMIT 1");
         if($response)
         {
-            $deleteImagec = "../".$product['data']['image'];
-            if(file_exists($deleteImage)){
-                unlink($deleteImage);
-            }
-
-            redirect('products.php', 'Product Deleted Successfully.');
+            redirect('products.php', 'Product moved to deleted items.');
         }
         else
         {

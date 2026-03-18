@@ -83,11 +83,20 @@ if(!function_exists('getAll')){
     $table = validate($tableName);
     $status = validate($status);
 
-    if($status == 'status'){
-        $query = "SELECT * FROM $table WHERE status ='0'";
-    }
-    else{
-        $query = "SELECT * FROM $table";
+    if($table === 'products' && ensureProductsDeletedAtColumn()){
+        if($status == 'status'){
+            $query = "SELECT * FROM $table WHERE status ='0' AND deleted_at IS NULL";
+        }
+        else{
+            $query = "SELECT * FROM $table WHERE deleted_at IS NULL";
+        }
+    } else {
+        if($status == 'status'){
+            $query = "SELECT * FROM $table WHERE status ='0'";
+        }
+        else{
+            $query = "SELECT * FROM $table";
+        }
     }
     return mysqli_query($conn, $query);
 }
@@ -187,5 +196,32 @@ if(!function_exists('jsonResponse')){
     ];
     echo json_encode($response);
     return;
+}
+}
+
+if(!function_exists('ensureProductsDeletedAtColumn')){
+    function ensureProductsDeletedAtColumn(){
+
+    global $conn;
+    static $checked = false;
+    static $available = false;
+
+    if($checked){
+        return $available;
+    }
+
+    $checked = true;
+    $checkResult = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'deleted_at'");
+    if($checkResult && mysqli_num_rows($checkResult) > 0){
+        $available = true;
+        return true;
+    }
+
+    $alterResult = mysqli_query($conn, "ALTER TABLE products ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL AFTER status");
+    if($alterResult){
+        $available = true;
+    }
+
+    return $available;
 }
 }
