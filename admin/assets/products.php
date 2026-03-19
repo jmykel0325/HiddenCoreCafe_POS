@@ -65,8 +65,8 @@
                     <tbody>
                         <?php while($item = mysqli_fetch_assoc($products)) : ?>
                         <?php
-                            $imagePath = ltrim((string)($item['image'] ?? ''), '/');
-                            $imageUrl = '/HiddenCoreCafe_POS/admin/' . $imagePath;
+                            $imagePath = $item['image'] ?? '';
+                            $imageUrl = $imagePath ? str_replace('assets/', '', $imagePath) : '';
                             $price12 = (float)($item['price_12oz'] ?? $item['price']);
                             $price16 = (float)($item['price_16oz'] ?? $item['price']);
                         ?>
@@ -120,8 +120,8 @@
                         <?php if($deletedProducts && mysqli_num_rows($deletedProducts) > 0): ?>
                             <?php while($item = mysqli_fetch_assoc($deletedProducts)) : ?>
                             <?php
-                                $imagePath = ltrim((string)($item['image'] ?? ''), '/');
-                                $imageUrl = '/HiddenCoreCafe_POS/admin/' . $imagePath;
+                                $imagePath = $item['image'] ?? '';
+                                $imageUrl = $imagePath ? str_replace('assets/', '', $imagePath) : '';
                                 $price12 = (float)($item['price_12oz'] ?? $item['price']);
                                 $price16 = (float)($item['price_16oz'] ?? $item['price']);
                             ?>

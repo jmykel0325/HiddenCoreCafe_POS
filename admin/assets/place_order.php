@@ -29,6 +29,45 @@ if (!function_exists('ensureOrderItemsSizeColumn')) {
     }
 }
 
+if (!function_exists('ensureOrdersDiscountColumns')) {
+    function ensureOrdersDiscountColumns($conn) {
+        static $checked = false;
+        static $available = false;
+
+        if ($checked) {
+            return $available;
+        }
+
+        $checked = true;
+        
+        // Check for discount_type column
+        $checkType = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'discount_type'");
+        if (!$checkType || mysqli_num_rows($checkType) === 0) {
+            mysqli_query($conn, "ALTER TABLE orders ADD COLUMN discount_type VARCHAR(20) NULL AFTER payment_mode");
+        }
+        
+        // Check for discount_rate column
+        $checkRate = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'discount_rate'");
+        if (!$checkRate || mysqli_num_rows($checkRate) === 0) {
+            mysqli_query($conn, "ALTER TABLE orders ADD COLUMN discount_rate DECIMAL(5,2) DEFAULT 0 AFTER discount_type");
+        }
+        
+        // Check for discount_amount column
+        $checkAmount = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'discount_amount'");
+        if (!$checkAmount || mysqli_num_rows($checkAmount) === 0) {
+            mysqli_query($conn, "ALTER TABLE orders ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0 AFTER discount_rate");
+        }
+        
+        // Check for final_total column (total after discount)
+        $checkFinal = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'final_total'");
+        if (!$checkFinal || mysqli_num_rows($checkFinal) === 0) {
+            mysqli_query($conn, "ALTER TABLE orders ADD COLUMN final_total DECIMAL(10,2) DEFAULT 0 AFTER discount_amount");
+        }
+
+        $available = true;
+        return true;
+    }
+}
 if (!function_exists('ensureOrdersGcashReferenceColumn')) {
     function ensureOrdersGcashReferenceColumn($conn) {
         static $checked = false;
@@ -88,38 +127,53 @@ if (isset($_POST['place_order'])) {
         $total += $qty * $unitPrice;
     }
 
+    $discount_type = isset($_POST['discount_type']) ? mysqli_real_escape_string($conn, $_POST['discount_type']) : '';
+    $discount_rate = isset($_POST['discount_rate']) ? floatval($_POST['discount_rate']) : 0;
+    $discount_amount = isset($_POST['discount_amount']) ? floatval($_POST['discount_amount']) : 0;
+
     if (empty($normalizedProducts)) {
         echo "<script>alert('No valid products found in order.'); window.location.href='orders-create.php';</script>";
         include('includes/footer.php');
         exit;
     }
 
+    // Calculate final total after discount
+    $subtotal = $total;
+    if ($discount_type === 'PWD' || $discount_type === 'Senior') {
+        $discount_rate = 0.20;
+        $discount_amount = $subtotal * $discount_rate;
+        $total = $subtotal - $discount_amount;
+    }
+    
+    $final_total = $total;
+    
+    $hasDiscountColumns = ensureOrdersDiscountColumns($conn);
     $hasGcashReferenceColumn = ensureOrdersGcashReferenceColumn($conn);
 
     if ($payment_mode === 'Cash') {
         $cash_received = isset($_POST['cash_received']) ? floatval($_POST['cash_received']) : 0;
         $change_due = $cash_received - $total;
+        
+        $columns = "customer_name, payment_mode, discount_type, discount_rate, discount_amount, final_total, total, cash_received, change_due";
+        $values = "'$customer_name', '$payment_mode', " . ($discount_type ? "'$discount_type'" : "NULL") . ", $discount_rate, $discount_amount, $final_total, $subtotal, $cash_received, $change_due";
+        
         if ($hasGcashReferenceColumn) {
-            $order_query = "INSERT INTO orders (customer_name, payment_mode, gcash_reference, total, cash_received, change_due) 
-                            VALUES ('$customer_name', '$payment_mode', NULL, '$total', '$cash_received', '$change_due')";
-        } else {
-            $order_query = "INSERT INTO orders (customer_name, payment_mode, total, cash_received, change_due) 
-                            VALUES ('$customer_name', '$payment_mode', '$total', '$cash_received', '$change_due')";
+            $columns .= ", gcash_reference";
+            $values .= ", NULL";
         }
-    } else { // For GCash or other non-cash methods
+        
+        $order_query = "INSERT INTO orders ($columns) VALUES ($values)";
+    } else { // For GCash
         if ($gcash_reference === '') {
             echo "<script>alert('GCash reference number is required.'); window.location.href='orders-create.php';</script>";
             include('includes/footer.php');
             exit;
         }
 
-        if ($hasGcashReferenceColumn) {
-            $order_query = "INSERT INTO orders (customer_name, payment_mode, gcash_reference, total) 
-                            VALUES ('$customer_name', '$payment_mode', '$gcash_reference_escaped', '$total')";
-        } else {
-            $order_query = "INSERT INTO orders (customer_name, payment_mode, total) 
-                            VALUES ('$customer_name', '$payment_mode', '$total')";
-        }
+        $columns = "customer_name, payment_mode, gcash_reference, discount_type, discount_rate, discount_amount, final_total, total";
+        $values = "'$customer_name', '$payment_mode', '$gcash_reference_escaped', " . ($discount_type ? "'$discount_type'" : "NULL") . ", $discount_rate, $discount_amount, $final_total, $subtotal";
+        
+        $order_query = "INSERT INTO orders ($columns) VALUES ($values)";
     }
 
     if (mysqli_query($conn, $order_query)) {

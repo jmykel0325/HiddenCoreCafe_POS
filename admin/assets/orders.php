@@ -91,10 +91,16 @@
                                 <div class="hc-order-actions">
                                     <a href="orders-view.php?id=<?= $order['id'] ?>" class="btn btn-action btn-sm">View</a>
                                     <?php if(!$isStaff): ?>
+                                        <a href="orders-edit.php?id=<?= $order['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="orders-cancel.php?id=<?= $order['id'] ?>" 
+                                           class="btn btn-secondary btn-sm"
+                                           onclick="return confirm('Are you sure you want to cancel this order? This will restore the product quantities.')">
+                                            Cancel
+                                        </a>
                                         <a href="orders-delete.php?id=<?= $order['id'] ?>" 
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this order?')">
-                                        Delete
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Are you sure you want to delete this order?')">
+                                            Delete
                                         </a>
                                     <?php endif; ?>
                                 </div>

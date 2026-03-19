@@ -108,8 +108,10 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                             <?php while ($item = mysqli_fetch_assoc($products)): ?>
                                 <?php $productCategoryName = $categoryNames[(int) $item['category_id']] ?? 'Uncategorized'; ?>
                                 <?php
-                                    $imagePath = ltrim((string)($item['image'] ?? ''), '/');
-                                    $imageUrl = '/HiddenCoreCafe_POS/admin/' . $imagePath;
+                                    $imagePath = $item['image'] ?? '';
+                                    // Database stores: assets/upload/products/filename.jpg
+                                    // We're in admin/assets/, so strip 'assets/' to get: upload/products/filename.jpg
+                                    $imageUrl = $imagePath ? str_replace('assets/', '', $imagePath) : '';
                                     $price12 = (float)($item['price_12oz'] ?? $item['price']);
                                     $price16 = (float)($item['price_16oz'] ?? $item['price']);
                                 ?>
@@ -157,6 +159,17 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                         <div class="hc-order-panel-section">
                             <label for="customerName" class="hc-order-label">Customer Name</label>
                             <input type="text" name="customer_name" id="customerName" required class="form-control" placeholder="Enter customer name">
+                        </div>
+
+                        <div class="hc-order-panel-section">
+                            <label for="discountType" class="hc-order-label">Discount Type</label>
+                            <select name="discount_type" class="form-select" id="discountType">
+                                <option value="">No Discount</option>
+                                <option value="PWD">PWD (20%)</option>
+                                <option value="Senior">Senior Citizen (20%)</option>
+                            </select>
+                            <input type="hidden" name="discount_rate" id="discountRate" value="0">
+                            <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
                         </div>
 
                         <div class="hc-order-panel-section">
@@ -349,7 +362,22 @@ $paymongoEnabled = $paymongoSecretKey !== ''
         }
         document.getElementById('grandTotal').textContent = total.toFixed(2);
         document.getElementById('orderSubtotal').textContent = total.toFixed(2);
-        document.getElementById('gcashTotal').textContent = total.toFixed(2);
+        
+        // Calculate discount
+        const discountType = document.getElementById('discountType').value;
+        let discountRate = 0;
+        if (discountType === 'PWD' || discountType === 'Senior') {
+            discountRate = 0.20;
+        }
+        const discountAmount = total * discountRate;
+        const finalTotal = total - discountAmount;
+        
+        document.getElementById('orderDiscount').textContent = discountAmount.toFixed(2);
+        document.getElementById('grandTotal').textContent = finalTotal.toFixed(2);
+        document.getElementById('gcashTotal').textContent = finalTotal.toFixed(2);
+        document.getElementById('discountRate').value = discountRate;
+        document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
+        
         attachQtyListeners();
         attachRemoveListeners();
         attachIncDecListeners();
@@ -545,6 +573,12 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             changeDueInput.value = '0.00';
         }
     }
+
+    const discountType = document.getElementById('discountType');
+
+    discountType.addEventListener('change', function() {
+        renderSelectedProducts();
+    });
 
     paymentMode.addEventListener('change', function() {
         updatePaymentMethodView();
