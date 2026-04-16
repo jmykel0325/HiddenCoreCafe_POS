@@ -2,6 +2,11 @@
 include('includes/header.php');
 include('../../config/dbcon.php');
 
+$statusColumnCheck = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'order_status'");
+if ($statusColumnCheck && mysqli_num_rows($statusColumnCheck) === 0) {
+    mysqli_query($conn, "ALTER TABLE orders ADD COLUMN order_status VARCHAR(20) NOT NULL DEFAULT 'pending' AFTER payment_mode");
+}
+
 if (!isset($_GET['id'])) {
     header('Location: orders.php');
     exit;
@@ -19,13 +24,18 @@ if (!$order) {
     exit;
 }
 
+if (strtolower((string)($order['order_status'] ?? 'pending')) === 'completed') {
+    header('Location: orders.php?error=completed_locked');
+    exit;
+}
+
 // Get order items
 $items_query = "SELECT * FROM order_items WHERE order_id = $order_id";
 $items_result = mysqli_query($conn, $items_query);
 $order_items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
 
 // Get all products for adding new items
-$products_query = "SELECT id, name, price, price_12oz, price_16oz, quantity, category_id FROM products WHERE deleted_at IS NULL AND (status = 0 OR status IS NULL) ORDER BY name";
+$products_query = "SELECT id, name, image, price, price_12oz, price_16oz, quantity, category_id FROM products WHERE deleted_at IS NULL AND (status = 0 OR status IS NULL) ORDER BY name";
 $products_result = mysqli_query($conn, $products_query);
 $products = mysqli_fetch_all($products_result, MYSQLI_ASSOC);
 
@@ -38,13 +48,16 @@ while ($cat = mysqli_fetch_assoc($categories_result)) {
 }
 
 if (isset($_POST['update_order'])) {
+    $lockCheckResult = mysqli_query($conn, "SELECT order_status FROM orders WHERE id = $order_id LIMIT 1");
+    $lockCheck = $lockCheckResult ? mysqli_fetch_assoc($lockCheckResult) : null;
+    if (strtolower((string)($lockCheck['order_status'] ?? 'pending')) === 'completed') {
+        header('Location: orders.php?error=completed_locked');
+        exit;
+    }
+
     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
     $payment_mode = mysqli_real_escape_string($conn, $_POST['payment_mode']);
     $gcash_reference = isset($_POST['gcash_reference']) ? mysqli_real_escape_string($conn, $_POST['gcash_reference']) : '';
-    $discount_type = isset($_POST['discount_type']) ? mysqli_real_escape_string($conn, $_POST['discount_type']) : '';
-    $discount_rate = isset($_POST['discount_rate']) ? floatval($_POST['discount_rate']) : 0;
-    $discount_amount = isset($_POST['discount_amount']) ? floatval($_POST['discount_amount']) : 0;
-    
     // Restore original quantities before updating
     foreach ($order_items as $item) {
         $restore_qty = intval($item['quantity']);
@@ -84,14 +97,11 @@ if (isset($_POST['update_order'])) {
         $total += $qty * $unitPrice;
     }
     
-    // Calculate discount
     $subtotal = $total;
-    if ($discount_type === 'PWD' || $discount_type === 'Senior') {
-        $discount_rate = 0.20;
-        $discount_amount = $subtotal * $discount_rate;
-        $total = $subtotal - $discount_amount;
-    }
-    $final_total = $total;
+    $discount_type = '';
+    $discount_rate = 0;
+    $discount_amount = 0;
+    $final_total = $subtotal;
     
     // Update order
     if ($payment_mode === 'Cash') {
@@ -100,7 +110,7 @@ if (isset($_POST['update_order'])) {
         mysqli_query($conn, "UPDATE orders SET 
             customer_name = '$customer_name',
             payment_mode = '$payment_mode',
-            discount_type = " . ($discount_type ? "'$discount_type'" : "NULL") . ",
+            discount_type = NULL,
             discount_rate = $discount_rate,
             discount_amount = $discount_amount,
             final_total = $final_total,
@@ -114,7 +124,7 @@ if (isset($_POST['update_order'])) {
             customer_name = '$customer_name',
             payment_mode = '$payment_mode',
             gcash_reference = '$gcash_reference',
-            discount_type = " . ($discount_type ? "'$discount_type'" : "NULL") . ",
+            discount_type = NULL,
             discount_rate = $discount_rate,
             discount_amount = $discount_amount,
             final_total = $final_total,
@@ -127,7 +137,7 @@ if (isset($_POST['update_order'])) {
 }
 ?>
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 hc-order-screen">
     <div class="card mt-4 shadow-sm">
         <div class="card-header">
             <h4 class="mb-0">
@@ -187,17 +197,6 @@ if (isset($_POST['update_order'])) {
                             </div>
 
                             <div class="hc-order-panel-section">
-                                <label for="discountType" class="hc-order-label">Discount Type</label>
-                                <select name="discount_type" class="form-select" id="discountType">
-                                    <option value="" <?= $order['discount_type'] === '' ? 'selected' : '' ?>>No Discount</option>
-                                    <option value="PWD" <?= $order['discount_type'] === 'PWD' ? 'selected' : '' ?>>PWD (20%)</option>
-                                    <option value="Senior" <?= $order['discount_type'] === 'Senior' ? 'selected' : '' ?>>Senior Citizen (20%)</option>
-                                </select>
-                                <input type="hidden" name="discount_rate" id="discountRate" value="<?= $order['discount_rate'] ?? 0 ?>">
-                                <input type="hidden" name="discount_amount" id="discountAmountInput" value="<?= $order['discount_amount'] ?? 0 ?>">
-                            </div>
-
-                            <div class="hc-order-panel-section">
                                 <label for="paymentMode" class="hc-order-label">Payment Mode</label>
                                 <select name="payment_mode" class="form-select" id="paymentMode" required>
                                     <option value="Cash" <?= $order['payment_mode'] === 'Cash' ? 'selected' : '' ?>>Cash</option>
@@ -233,14 +232,6 @@ if (isset($_POST['update_order'])) {
 
                             <div class="hc-order-summary">
                                 <div class="hc-order-summary-row">
-                                    <span>Subtotal</span>
-                                    <strong>&#8369;<span id="orderSubtotal">0.00</span></strong>
-                                </div>
-                                <div class="hc-order-summary-row">
-                                    <span>Discount</span>
-                                    <strong>-&#8369;<span id="orderDiscount">0.00</span></strong>
-                                </div>
-                                <div class="hc-order-summary-row hc-order-summary-total">
                                     <span>Total</span>
                                     <strong>&#8369;<span id="grandTotal">0.00</span></strong>
                                 </div>
@@ -309,12 +300,7 @@ if (isset($_POST['update_order'])) {
             row.innerHTML = `
                 <div class="product-title">
                     <div class="cart-item-name">${prod.name}</div>
-                    <div class="mt-1">
-                        <select class="form-select form-select-sm product-size-select cart-item-size-select" data-line-key="${lineKey}">
-                            <option value="12oz" ${prod.size === '12oz' ? 'selected' : ''}>12oz - PHP ${prod.price12.toFixed(2)}</option>
-                            <option value="16oz" ${prod.size === '16oz' ? 'selected' : ''}>16oz - PHP ${prod.price16.toFixed(2)}</option>
-                        </select>
-                    </div>
+                    <div class="cart-item-size-text">${prod.size}</div>
                 </div>
                 <div class="qty-controls">
                     <button type="button" class="incdec-btn" data-decrement="${lineKey}" title="Decrease">
@@ -325,8 +311,10 @@ if (isset($_POST['update_order'])) {
                         <svg viewBox="0 0 20 20" fill="none"><rect x="9" y="4" width="2" height="12" rx="1" fill="currentColor"/><rect x="4" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
                     </button>
                 </div>
-                <div class="product-total">&#8369;${(prod.unitPrice * prod.quantity).toFixed(2)}</div>
-                <button type="button" class="btn btn-outline-danger btn-sm remove-btn" data-remove="${lineKey}">&times;</button>
+                <div class="product-line-actions">
+                    <div class="product-total">&#8369;${(prod.unitPrice * prod.quantity).toFixed(2)}</div>
+                    <button type="button" class="hc-row-delete-btn remove-btn" data-remove="${lineKey}" title="Remove item" aria-label="Remove item">&times;</button>
+                </div>
                 <input type="hidden" name="products[${lineKey}][id]" value="${prod.id}">
                 <input type="hidden" name="products[${lineKey}][quantity]" value="${prod.quantity}" id="hidden-qty-${lineKey}">
                 <input type="hidden" name="products[${lineKey}][price]" value="${prod.unitPrice}" id="hidden-price-${lineKey}">
@@ -339,25 +327,10 @@ if (isset($_POST['update_order'])) {
             container.innerHTML = emptyOrderMarkup;
         }
         document.getElementById('grandTotal').textContent = total.toFixed(2);
-        document.getElementById('orderSubtotal').textContent = total.toFixed(2);
-        
-        // Calculate discount
-        const discountType = document.getElementById('discountType').value;
-        let discountRate = 0;
-        if (discountType === 'PWD' || discountType === 'Senior') {
-            discountRate = 0.20;
-        }
-        const discountAmount = total * discountRate;
-        const finalTotal = total - discountAmount;
-        
-        document.getElementById('orderDiscount').textContent = discountAmount.toFixed(2);
-        document.getElementById('grandTotal').textContent = finalTotal.toFixed(2);
-        document.getElementById('discountRate').value = discountRate;
-        document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
+        document.getElementById('grandTotal').textContent = total.toFixed(2);
         
         attachIncDecListeners();
         attachRemoveListeners();
-        attachSizeListeners();
         updateChangeDue();
     }
 
@@ -389,36 +362,6 @@ if (isset($_POST['update_order'])) {
             btn.addEventListener('click', function() {
                 const lineKey = this.getAttribute('data-remove');
                 delete selectedProducts[lineKey];
-                renderSelectedProducts();
-            });
-        });
-    }
-
-    function attachSizeListeners() {
-        document.querySelectorAll('#selectedProducts [data-line-key]').forEach(function(select) {
-            select.addEventListener('change', function() {
-                const oldLineKey = this.getAttribute('data-line-key');
-                const prod = selectedProducts[oldLineKey];
-                if (!prod) return;
-                const newSize = this.value === '16oz' ? '16oz' : '12oz';
-                const newLineKey = lineKeyOf(prod.id, newSize);
-
-                if (oldLineKey === newLineKey) {
-                    prod.size = newSize;
-                    prod.unitPrice = newSize === '16oz' ? prod.price16 : prod.price12;
-                    renderSelectedProducts();
-                    return;
-                }
-
-                if (selectedProducts[newLineKey]) {
-                    selectedProducts[newLineKey].quantity += prod.quantity;
-                    delete selectedProducts[oldLineKey];
-                } else {
-                    delete selectedProducts[oldLineKey];
-                    prod.size = newSize;
-                    prod.unitPrice = newSize === '16oz' ? prod.price16 : prod.price12;
-                    selectedProducts[newLineKey] = prod;
-                }
                 renderSelectedProducts();
             });
         });
@@ -509,11 +452,6 @@ if (isset($_POST['update_order'])) {
 
     cashGivenInput.addEventListener('input', function() {
         updateChangeDue();
-    });
-
-    const discountType = document.getElementById('discountType');
-    discountType.addEventListener('change', function() {
-        renderSelectedProducts();
     });
 
     document.getElementById('orderForm').addEventListener('submit', function(e) {

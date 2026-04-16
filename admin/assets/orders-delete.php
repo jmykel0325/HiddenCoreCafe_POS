@@ -13,13 +13,27 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit();
 }
 
-$order_id = $_GET['id'];
+$statusColumnCheck = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'order_status'");
+if ($statusColumnCheck && mysqli_num_rows($statusColumnCheck) === 0) {
+    mysqli_query($conn, "ALTER TABLE orders ADD COLUMN order_status VARCHAR(20) NOT NULL DEFAULT 'pending' AFTER payment_mode");
+}
 
-// Delete items first due to foreign key constraint
+$order_id = (int)$_GET['id'];
+$orderRes = mysqli_query($conn, "SELECT id, order_status FROM orders WHERE id = $order_id LIMIT 1");
+if (!$orderRes || mysqli_num_rows($orderRes) === 0) {
+    header("Location: orders.php?error=not_found");
+    exit();
+}
+
+$order = mysqli_fetch_assoc($orderRes);
+if (strtolower((string)($order['order_status'] ?? 'pending')) === 'completed') {
+    header("Location: orders.php?error=completed_locked");
+    exit();
+}
+
 $delete_items_query = "DELETE FROM order_items WHERE order_id = $order_id";
 mysqli_query($conn, $delete_items_query);
 
-// Then delete the order
 $delete_order_query = "DELETE FROM orders WHERE id = $order_id";
 $delete_result = mysqli_query($conn, $delete_order_query);
 

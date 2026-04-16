@@ -68,24 +68,25 @@ $paymongoEnabled = $paymongoSecretKey !== ''
 ?>
 
 <div class="hc-pos hc-order-screen">
-    <div class="hc-order-hero">
-        <div class="hc-order-hero-copy">
-            <h1 class="hc-order-hero-title"><?= htmlspecialchars($greeting) ?>, <?= htmlspecialchars($currentAdminName) ?></h1>
-            <p class="hc-order-hero-date"><?= htmlspecialchars(date('l, F j, Y')) ?></p>
-        </div>
-        <div class="hc-order-hero-tools">
-            <a href="products-create.php" class="hc-order-action-btn">
-                <i class="fas fa-plus"></i>
-                <span>Add Products</span>
-            </a>
-        </div>
-    </div>
-
     <?php alertMessage(); ?>
 
     <form action="place_order.php" method="POST" id="orderForm">
         <div class="hc-order-board">
             <div class="hc-order-main">
+                <div class="hc-order-topbar">
+                    <div class="hc-order-topbar-left">
+                        <span class="hc-topbar-dot"><i class="fas fa-location-dot"></i></span>
+                        <span class="hc-topbar-text">Hidden Core Cafe POS</span>
+                    </div>
+                    <div class="hc-order-topbar-right">
+                        <span class="hc-topbar-text">Welcome, <strong><?= htmlspecialchars($currentAdminName) ?></strong></span>
+                    </div>
+                </div>
+
+                <div class="hc-order-search-inline">
+                    <input type="text" id="productSearchInput" class="form-control" placeholder="Search product by name...">
+                </div>
+
                 <div class="hc-order-filter-row">
                     <a href="orders-create.php" class="hc-category-chip <?= $selectedCategoryId === null ? 'active' : '' ?>">
                         <span>All</span>
@@ -123,22 +124,31 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                                          data-price16="<?= htmlspecialchars((string)$price16) ?>"
                                          data-quantity="<?= (int) $item['quantity'] ?>"
                                          <?= (int) $item['quantity'] === 0 ? 'data-disabled="true"' : '' ?>>
-                                        <div class="hc-product-media">
-                                            <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-image">
-                                            <div class="hc-stock-pill product-quantity"><strong><?= (int) $item['quantity'] ?></strong> Stocks</div>
-                                            <?php if ((int) $item['quantity'] === 0): ?>
-                                                <div class="out-of-stock-overlay">Out of Stock</div>
-                                            <?php endif; ?>
+                                        <div class="hc-product-head">
+                                            <div class="hc-product-media hc-product-thumb">
+                                                <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-image">
+                                                <?php if ((int) $item['quantity'] === 0): ?>
+                                                    <div class="out-of-stock-overlay">Out of Stock</div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="product-info">
+                                                <div class="product-name"><?= htmlspecialchars($item['name']) ?></div>
+                                                <div class="hc-product-card-footer">
+                                                    <div class="hc-product-cat"><?= htmlspecialchars($productCategoryName) ?> | 12oz &#8369;<?= number_format($price12, 2) ?> | 16oz &#8369;<?= number_format($price16, 2) ?></div>
+                                                </div>
+                                                <div class="hc-card-size-toggle mt-2">
+                                                    <button type="button" class="hc-size-pill active" data-card-size="12oz">12oz</button>
+                                                    <button type="button" class="hc-size-pill" data-card-size="16oz">16oz</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="product-info">
-                                            <div class="product-name"><?= htmlspecialchars($item['name']) ?></div>
-                                            <div class="hc-product-card-footer">
-                                                <div class="hc-product-cat"><?= htmlspecialchars($productCategoryName) ?> | 12oz &#8369;<?= number_format($price12, 2) ?> | 16oz &#8369;<?= number_format($price16, 2) ?></div>
+                                        <div class="hc-product-actions mt-2">
+                                            <div class="hc-inline-qty">
+                                                <button type="button" class="hc-inline-qty-btn" data-card-dec title="Decrease">-</button>
+                                                <input type="text" class="hc-inline-qty-input" data-card-qty value="1" readonly>
+                                                <button type="button" class="hc-inline-qty-btn" data-card-inc title="Increase">+</button>
                                             </div>
-                                            <div class="d-flex gap-2 mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary w-100" data-add-size="12oz">Add 12oz</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary w-100" data-add-size="16oz">Add 16oz</button>
-                                            </div>
+                                            <button type="button" class="btn hc-add-cart-btn w-100" data-add-to-cart>Add to cart</button>
                                         </div>
                                     </div>
                                 </div>
@@ -156,94 +166,59 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             <div class="hc-order-side">
                 <div class="hc-checkout">
                     <div class="hc-checkout-card hc-order-panel">
-                        <div class="hc-order-panel-section">
-                            <label for="customerName" class="hc-order-label">Customer Name</label>
-                            <input type="text" name="customer_name" id="customerName" required class="form-control" placeholder="Enter customer name">
+                        <div class="hc-cart-head">
+                            <h3>Cart</h3>
+                            <p>Order #NEW</p>
                         </div>
-
-                        <div class="hc-order-panel-section">
-                            <label for="discountType" class="hc-order-label">Discount Type</label>
-                            <select name="discount_type" class="form-select" id="discountType">
-                                <option value="">No Discount</option>
-                                <option value="PWD">PWD (20%)</option>
-                                <option value="Senior">Senior Citizen (20%)</option>
-                            </select>
-                            <input type="hidden" name="discount_rate" id="discountRate" value="0">
-                            <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
-                        </div>
-
-                        <div class="hc-order-panel-section">
-                            <label for="paymentMode" class="hc-order-label">Payment Mode</label>
-                            <select name="payment_mode" class="form-select" id="paymentMode" required>
-                                <option value="Cash">Cash</option>
-                                <option value="GCash">GCash</option>
-                            </select>
-                        </div>
-
-                        <div class="hc-order-panel-section" id="cashGivenContainer" style="display:none;">
-                            <label for="cashGiven" class="hc-order-label">Cash Received</label>
-                            <input type="number" min="0" step="0.01" name="cash_received" id="cashGiven" class="form-control">
-                            <input type="hidden" name="change_due" id="changeDueInput" value="0.00">
-                            <div id="changeDisplay" class="hc-order-change" style="display:none;">
-                                Change Due: &#8369;<span id="changeAmount">0.00</span>
-                            </div>
-                        </div>
-
-                        <div class="hc-order-panel-section" id="paymongoContainer" style="display:none;">
-                            <div class="gcash-container">
-                                <div class="gcash-header">
-                                    <img src="https://1000logos.net/wp-content/uploads/2023/05/GCash-Logo.png" alt="GCash Logo">
-                                    <h6>You are paying</h6>
-                                </div>
-                                <div class="gcash-details">
-                                    <p class="amount">&#8369;<span id="gcashTotal">0.00</span></p>
-                                    <p>Hidden Core Cafe</p>
-                                </div>
-                                <div class="text-center mb-3">
-                                    <img src="img/gcash-qr.jpg" alt="GCash QR Code" style="max-width: 200px; border-radius: 8px; border: 1px solid #ddd;">
-                                    <p class="mt-2 mb-0 fw-bold text-primary">09497836057</p>
-                                    <p class="small text-muted">Scan to pay with GCash</p>
-                                </div>
-                                <p class="small text-muted mb-0">You will be redirected to complete your payment securely.</p>
-                            </div>
-                        </div>
-
-                        <div class="hc-order-panel-section" id="gcashReferenceContainer" style="display:none;">
-                            <label for="gcashReference" class="hc-order-label">GCash Reference Number</label>
-                            <input type="text" name="gcash_reference" id="gcashReference" class="form-control" placeholder="Enter GCash reference number">
-                        </div>
-
                         <div class="hc-order-panel-section hc-order-panel-section-items">
                             <div class="hc-order-items-heading">Your order:</div>
                             <div id="selectedProducts" class="hc-checkout-items">
                                 <div class="hc-order-empty-state hc-order-empty-state-inline">
                                     <div class="hc-order-empty-icon"><i class="fas fa-cart-shopping"></i></div>
                                     <p class="mb-0">No items in order</p>
+                                    <small>Add drinks from the left to start order.</small>
                                 </div>
                             </div>
                         </div>
 
+                        <div id="checkoutDetails" style="display:none;">
+                            <div class="hc-order-panel-section">
+                                <label for="customerName" class="hc-order-label">Customer Name</label>
+                                <input type="text" name="customer_name" id="customerName" class="form-control" placeholder="Enter customer name">
+                            </div>
+
+                            <div class="hc-order-panel-section">
+                                <label for="paymentMode" class="hc-order-label">Payment Mode</label>
+                                <select name="payment_mode" class="form-select" id="paymentMode">
+                                    <option value="Cash">Cash</option>
+                                    <option value="GCash">GCash</option>
+                                </select>
+                            </div>
+
+                            <div class="hc-order-panel-section" id="cashGivenContainer" style="display:none;">
+                                <label for="cashGiven" class="hc-order-label">Cash Received</label>
+                                <input type="number" min="0" step="0.01" name="cash_received" id="cashGiven" class="form-control">
+                                <input type="hidden" name="change_due" id="changeDueInput" value="0.00">
+                                <div id="changeDisplay" class="hc-order-change" style="display:none;">
+                                    Change Due: &#8369;<span id="changeAmount">0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="hc-order-panel-section" id="gcashReferenceContainer" style="display:none;">
+                                <label for="gcashReference" class="hc-order-label">GCash Reference Number</label>
+                                <input type="text" name="gcash_reference" id="gcashReference" class="form-control" placeholder="Enter GCash reference number">
+                            </div>
+                        </div>
+
                         <div class="hc-order-summary">
-                            <div class="hc-order-summary-row">
-                                <span>Subtotal</span>
-                                <strong>&#8369;<span id="orderSubtotal">0.00</span></strong>
-                            </div>
-                            <div class="hc-order-summary-row">
-                                <span>Discount</span>
-                                <strong>-&#8369;<span id="orderDiscount">0.00</span></strong>
-                            </div>
                             <div class="hc-order-summary-row hc-order-summary-total">
                                 <span>Total</span>
                                 <strong>&#8369;<span id="grandTotal">0.00</span></strong>
                             </div>
                         </div>
 
-                        <div class="hc-order-panel-section hc-order-panel-section-compact">
-                            <input type="text" class="form-control hc-order-promo-input" placeholder="Voucher / Promo code" disabled>
-                        </div>
-
                         <div class="hc-checkout-footer">
-                            <button type="submit" name="place_order" id="placeOrderBtn" class="btn btn-success w-100 hc-order-submit">Place Order</button>
+                            <button type="submit" name="place_order" id="placeOrderBtn" class="btn btn-success w-100 hc-order-submit">Checkout</button>
                         </div>
                     </div>
                 </div>
@@ -266,6 +241,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     }
 
     let selectedProducts = {};
+    let isCheckoutStep = false;
     const lineKeyOf = (id, size) => `${id}__${size}`;
 
     function selectedQtyForProduct(productId) {
@@ -317,6 +293,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             <div class="hc-order-empty-state hc-order-empty-state-inline">
                 <div class="hc-order-empty-icon"><i class="fas fa-cart-shopping"></i></div>
                 <p class="mb-0">No items in order</p>
+                <small>Add drinks from the left to start order.</small>
             </div>
         `;
         container.innerHTML = '';
@@ -327,16 +304,18 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             const prod = selectedProducts[lineKey];
             total += prod.unitPrice * prod.quantity;
             const row = document.createElement('div');
-            row.className = 'selected-product-row';
-            row.innerHTML = `
+            row.className = isCheckoutStep ? 'checkout-summary-item' : 'selected-product-row';
+            row.innerHTML = isCheckoutStep ? `
+                <li>${prod.name} - ${prod.quantity} x &#8369;${prod.unitPrice.toFixed(2)}</li>
+                <input type="hidden" name="products[${lineKey}][id]" value="${prod.id}">
+                <input type="hidden" name="products[${lineKey}][quantity]" value="${prod.quantity}" id="hidden-qty-${lineKey}">
+                <input type="hidden" name="products[${lineKey}][price]" value="${prod.unitPrice}" id="hidden-price-${lineKey}">
+                <input type="hidden" name="products[${lineKey}][name]" value="${prod.name}">
+                <input type="hidden" name="products[${lineKey}][size]" value="${prod.size}" id="hidden-size-${lineKey}">
+            ` : `
                 <div class="product-title">
                     <div class="cart-item-name">${prod.name}</div>
-                    <div class="mt-1">
-                        <select class="form-select form-select-sm product-size-select cart-item-size-select" data-line-key="${lineKey}">
-                            <option value="12oz" ${prod.size === '12oz' ? 'selected' : ''}>12oz - PHP ${prod.price12.toFixed(2)}</option>
-                            <option value="16oz" ${prod.size === '16oz' ? 'selected' : ''}>16oz - PHP ${prod.price16.toFixed(2)}</option>
-                        </select>
-                    </div>
+                    <div class="cart-item-size-text">${prod.size}</div>
                 </div>
                 <div class="qty-controls">
                     <button type="button" class="incdec-btn" data-decrement="${lineKey}" title="Decrease">
@@ -347,8 +326,10 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                         <svg viewBox="0 0 20 20" fill="none"><rect x="9" y="4" width="2" height="12" rx="1" fill="currentColor"/><rect x="4" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
                     </button>
                 </div>
-                <div class="product-total">&#8369;${(prod.unitPrice * prod.quantity).toFixed(2)}</div>
-                <button type="button" class="btn btn-outline-danger btn-sm remove-btn" data-remove="${lineKey}">&times;</button>
+                <div class="product-line-actions">
+                    <div class="product-total">&#8369;${(prod.unitPrice * prod.quantity).toFixed(2)}</div>
+                    <button type="button" class="hc-row-delete-btn remove-btn" data-remove="${lineKey}" title="Remove item" aria-label="Remove item">&times;</button>
+                </div>
                 <input type="hidden" name="products[${lineKey}][id]" value="${prod.id}">
                 <input type="hidden" name="products[${lineKey}][quantity]" value="${prod.quantity}" id="hidden-qty-${lineKey}">
                 <input type="hidden" name="products[${lineKey}][price]" value="${prod.unitPrice}" id="hidden-price-${lineKey}">
@@ -359,24 +340,12 @@ $paymongoEnabled = $paymongoSecretKey !== ''
         }
         if (!hasProducts) {
             container.innerHTML = emptyOrderMarkup;
+        } else if (isCheckoutStep) {
+            container.classList.add('checkout-summary-list');
+        } else {
+            container.classList.remove('checkout-summary-list');
         }
         document.getElementById('grandTotal').textContent = total.toFixed(2);
-        document.getElementById('orderSubtotal').textContent = total.toFixed(2);
-        
-        // Calculate discount
-        const discountType = document.getElementById('discountType').value;
-        let discountRate = 0;
-        if (discountType === 'PWD' || discountType === 'Senior') {
-            discountRate = 0.20;
-        }
-        const discountAmount = total * discountRate;
-        const finalTotal = total - discountAmount;
-        
-        document.getElementById('orderDiscount').textContent = discountAmount.toFixed(2);
-        document.getElementById('grandTotal').textContent = finalTotal.toFixed(2);
-        document.getElementById('gcashTotal').textContent = finalTotal.toFixed(2);
-        document.getElementById('discountRate').value = discountRate;
-        document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
         
         attachQtyListeners();
         attachRemoveListeners();
@@ -457,7 +426,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
         });
     }
 
-    function addProductToOrder(card, chosenSize = '12oz') {
+    function addProductToOrder(card, chosenSize = '12oz', qtyToAdd = 1) {
             if (card.dataset.disabled === 'true') {
                 showNotif('Sorry, this product is currently out of stock.', '#d9534f');
                 return;
@@ -472,14 +441,15 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             const lineKey = lineKeyOf(id, chosenSize);
             let selectedQty = selectedQtyForProduct(id);
             let availableQty = maxQuantity - selectedQty;
-            if (availableQty <= 0) {
+            const requestedQty = Math.max(1, parseInt(qtyToAdd) || 1);
+            if (availableQty <= 0 || requestedQty > availableQty) {
                 card.classList.add('out-of-stock');
                 card.setAttribute('data-disabled', 'true');
-                showNotif('Sorry, this product is currently out of stock.', '#d9534f');
+                showNotif('Cannot add more than available stock.', '#d9534f');
                 return;
             }
             if (selectedProducts[lineKey]) {
-                selectedProducts[lineKey].quantity += 1;
+                selectedProducts[lineKey].quantity += requestedQty;
             } else {
                 selectedProducts[lineKey] = {
                     id: id,
@@ -488,7 +458,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                     price12: price12,
                     price16: price16,
                     unitPrice: chosenSize === '16oz' ? price16 : price12,
-                    quantity: 1,
+                    quantity: requestedQty,
                     maxQuantity: maxQuantity
                 };
             }
@@ -496,58 +466,98 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     }
 
     document.querySelectorAll('.product-card').forEach(function(card) {
-        card.addEventListener('click', function(e) {
-            if (e.target.closest('[data-add-size]')) {
-                return;
-            }
-            addProductToOrder(card, '12oz');
-        });
+        const qtyInput = card.querySelector('[data-card-qty]');
+        const incBtn = card.querySelector('[data-card-inc]');
+        const decBtn = card.querySelector('[data-card-dec]');
+        const addBtn = card.querySelector('[data-add-to-cart]');
+        const sizeBtns = card.querySelectorAll('[data-card-size]');
+        let selectedSize = '12oz';
 
-        card.querySelectorAll('[data-add-size]').forEach(function(btn) {
+        sizeBtns.forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const chosenSize = this.getAttribute('data-add-size') || '12oz';
-                addProductToOrder(card, chosenSize);
+                selectedSize = this.getAttribute('data-card-size') === '16oz' ? '16oz' : '12oz';
+                sizeBtns.forEach(function(other) {
+                    other.classList.toggle('active', other === btn);
+                });
             });
         });
+
+        if (incBtn && qtyInput) {
+            incBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const current = parseInt(qtyInput.value) || 1;
+                const max = parseInt(card.dataset.quantity) || 1;
+                qtyInput.value = String(Math.min(max, current + 1));
+            });
+        }
+
+        if (decBtn && qtyInput) {
+            decBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const current = parseInt(qtyInput.value) || 1;
+                qtyInput.value = String(Math.max(1, current - 1));
+            });
+        }
+
+        if (addBtn && qtyInput) {
+            addBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const qty = parseInt(qtyInput.value) || 1;
+                addProductToOrder(card, selectedSize, qty);
+                qtyInput.value = '1';
+            });
+        }
     });
+
+    const productSearchInput = document.getElementById('productSearchInput');
+    if (productSearchInput) {
+        productSearchInput.addEventListener('input', function() {
+            const keyword = (this.value || '').trim().toLowerCase();
+            document.querySelectorAll('.hc-product-cell .product-card').forEach(function(card) {
+                const name = (card.dataset.name || '').toLowerCase();
+                const showCard = keyword === '' || name.startsWith(keyword);
+                const cell = card.closest('.hc-product-cell');
+                if (cell) {
+                    cell.style.display = showCard ? '' : 'none';
+                }
+            });
+        });
+    }
 
     const paymentMode = document.getElementById('paymentMode');
     const cashGivenContainer = document.getElementById('cashGivenContainer');
-    const paymongoContainer = document.getElementById('paymongoContainer');
     const cashGivenInput = document.getElementById('cashGiven');
     const grandTotalSpan = document.getElementById('grandTotal');
     const changeDisplay = document.getElementById('changeDisplay');
     const changeAmount = document.getElementById('changeAmount');
     const changeDueInput = document.getElementById('changeDueInput');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
-    const gcashTotalSpan = document.getElementById('gcashTotal');
     const gcashReferenceContainer = document.getElementById('gcashReferenceContainer');
     const gcashReferenceInput = document.getElementById('gcashReference');
+    const orderPanel = document.querySelector('.hc-order-panel');
+    const checkoutDetails = document.getElementById('checkoutDetails');
+    const customerNameInput = document.getElementById('customerName');
     const paymongoEnabled = <?= $paymongoEnabled ? 'true' : 'false' ?>;
 
     function updatePaymentMethodView() {
         const total = parseFloat(grandTotalSpan.textContent.replace(/,/g, '')) || 0;
 
         cashGivenContainer.style.display = 'none';
-        paymongoContainer.style.display = 'none';
         gcashReferenceContainer.style.display = 'none';
         gcashReferenceInput.required = false;
 
         if (paymentMode.value === 'Cash') {
             cashGivenContainer.style.display = '';
+            orderPanel.classList.remove('hc-payment-gcash');
         } else if (paymentMode.value === 'GCash') {
-            paymongoContainer.style.display = '';
             gcashReferenceContainer.style.display = '';
             gcashReferenceInput.required = true;
+            orderPanel.classList.add('hc-payment-gcash');
         }
 
-        if (paymentMode.value === 'GCash') {
-            placeOrderBtn.textContent = 'Pay with GCash';
-            gcashTotalSpan.textContent = total.toFixed(2);
-        } else {
-            placeOrderBtn.textContent = 'Place Order';
-        }
+        if (!isCheckoutStep) return;
+        placeOrderBtn.textContent = paymentMode.value === 'GCash' ? 'Pay with GCash' : 'Place Order';
 
         if (paymentMode.value !== 'Cash') {
             changeDisplay.style.display = 'none';
@@ -574,12 +584,6 @@ $paymongoEnabled = $paymongoSecretKey !== ''
         }
     }
 
-    const discountType = document.getElementById('discountType');
-
-    discountType.addEventListener('change', function() {
-        renderSelectedProducts();
-    });
-
     paymentMode.addEventListener('change', function() {
         updatePaymentMethodView();
         updateChangeDue();
@@ -592,6 +596,24 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     updatePaymentMethodView();
 
     document.getElementById('orderForm').addEventListener('submit', function(e) {
+        if (!isCheckoutStep) {
+            if (Object.keys(selectedProducts).length === 0) {
+                showNotif('Please add at least one item first.', '#d9534f');
+                e.preventDefault();
+                return false;
+            }
+            isCheckoutStep = true;
+            checkoutDetails.style.display = '';
+            customerNameInput.required = true;
+            paymentMode.required = true;
+            updatePaymentMethodView();
+            placeOrderBtn.textContent = paymentMode.value === 'GCash' ? 'Pay with GCash' : 'Place Order';
+            renderSelectedProducts();
+            customerNameInput.focus();
+            e.preventDefault();
+            return false;
+        }
+
         if (paymentMode.value === 'Cash') {
             const total = parseFloat(grandTotalSpan.textContent.replace(/,/g, '')) || 0;
             const cash = parseFloat(cashGivenInput.value) || 0;

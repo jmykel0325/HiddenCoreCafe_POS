@@ -12,15 +12,27 @@ window.addEventListener('DOMContentLoaded', event => {
     // Toggle the side navigation
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
+        const isTabletPortrait = window.innerWidth <= 1024;
+        if (isTabletPortrait) {
+            document.body.classList.add('sb-sidenav-toggled');
+        } else if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
+            document.body.classList.add('sb-sidenav-toggled');
+        }
+
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
             document.body.classList.toggle('sb-sidenav-toggled');
             localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
         });
     }
+
+    const navLinks = document.querySelectorAll('#layoutSidenav_nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                document.body.classList.add('sb-sidenav-toggled');
+            }
+        });
+    });
 
 });

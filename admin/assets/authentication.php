@@ -31,6 +31,8 @@ if(isset($_SESSION['loggedIn'])){
             'orders-create.php',
             'orders.php',
             'orders-view.php',
+            'orders-edit.php',
+            'orders-complete.php',
             'place_order.php',
             'paymongo-create-source.php',
             'paymongo-payment-success.php',
