@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 03, 2026 at 05:29 AM
+-- Generation Time: Apr 21, 2026 at 09:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -17,8 +17,8 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
-
--- Database: `HiddenCoreCafe`
+--
+-- Database: `hiddencorecafe`
 --
 
 -- --------------------------------------------------------
@@ -44,8 +44,8 @@ CREATE TABLE `cashier_staff` (
 --
 
 INSERT INTO `cashier_staff` (`id`, `first_name`, `middle_name`, `last_name`, `email`, `username`, `password`, `position`, `created_at`) VALUES
-(1, 'User', 'User', 'User', 'Kopikuys@gmail.com', 'Kopikuys', '$2y$10$kDuHHqwwkWaN8tPMF32da.x4bdwS3..mmiAk8ukGssQ3EyqEjPWqa', 'Owner', '2025-03-12 14:03:27'),
-(2, 'John Michael', 'Rodrigo', 'Castillo', 'jmykel1342@gmail.com', 'jmykel1342', '$2y$10$V1tIMS4vZzQlujxQhpm0DuXYyZ2dLYpAYEURmwegxu1dZstX.CRR6', 'Cashier', '2025-05-21 09:42:53');
+(3, 'Admin JM', '', 'User', 'jmcastillo1342@example.com', 'jmcastillo1342', '$2y$10$U5x/N6v3ewJV1nFZ8dklHO29aCc.kaVc3/YRgWY/UVyE4oJlaX2WO', 'Owner', '2026-03-16 20:08:49'),
+(4, 'John Michael', 'Rodrigo', 'Castillo', 'jmykel0325@gmail.com', 'jmykel0325', '$2y$10$Oo.buQH5sLcYayiOkiGemeqYAm7SpJbDhCNDp4BqKANpeKUSXn/B.', 'Cashier', '2026-03-16 20:19:43');
 
 -- --------------------------------------------------------
 
@@ -68,7 +68,30 @@ INSERT INTO `categories` (`id`, `name`, `description`, `status`) VALUES
 (1, 'Coffee Series', 'Every drink that belongs here has coffee.', 0),
 (2, 'Non-Coffee Series', 'Every drink here is non-coffee.', 0),
 (3, 'Choco-Ey Series', 'Every drink here is chocolate-based.', 0),
-(4, 'Rookie Series', 'Every drink that belongs here offers a perfect balance of sweetness and crunch.', 0);
+(4, 'Rookie Series', 'Every drink that belongs here offers a perfect balance of sweetness and crunch.', 0),
+(7, 'Flavored Latte', '', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `daily_quota`
+--
+
+CREATE TABLE `daily_quota` (
+  `id` int(11) NOT NULL,
+  `quota_date` date NOT NULL,
+  `target_cups` int(11) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `daily_quota`
+--
+
+INSERT INTO `daily_quota` (`id`, `quota_date`, `target_cups`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, '2026-04-22', 100, 3, '2026-04-22 03:18:10', '2026-04-22 03:30:34');
 
 -- --------------------------------------------------------
 
@@ -80,6 +103,11 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `customer_name` varchar(255) NOT NULL,
   `payment_mode` enum('Cash','GCash') NOT NULL,
+  `order_status` varchar(20) NOT NULL DEFAULT 'pending',
+  `discount_type` varchar(20) DEFAULT NULL,
+  `discount_rate` decimal(5,2) DEFAULT 0.00,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `final_total` decimal(10,2) DEFAULT 0.00,
   `gcash_reference` varchar(100) DEFAULT NULL,
   `total` decimal(10,2) NOT NULL,
   `cash_received` decimal(10,2) DEFAULT 0.00,
@@ -91,28 +119,13 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `customer_name`, `payment_mode`, `gcash_reference`, `total`, `cash_received`, `change_due`, `created_at`) VALUES
-(24, 'Nicole', 'GCash', NULL, 78.00, 0.00, -78.00, '2025-05-18 21:20:23'),
-(25, 'Jennie', 'Cash', NULL, 39.00, 50.00, 11.00, '2025-05-18 21:28:40'),
-(26, 'Princess', 'GCash', NULL, 39.00, 0.00, -39.00, '2025-05-18 22:33:10'),
-(27, 'Hannah', 'Cash', NULL, 117.00, 120.00, 3.00, '2025-05-18 22:37:02'),
-(28, 'John', 'GCash', NULL, 39.00, 0.00, -39.00, '2025-05-18 22:38:14'),
-(29, 'Naruto', 'Cash', NULL, 156.00, 170.00, 14.00, '2025-05-20 22:30:18'),
-(30, 'Maria', 'Cash', NULL, 234.00, 500.00, 266.00, '2025-05-21 17:47:10'),
-(31, 'Chris', 'GCash', NULL, 39.00, 0.00, -39.00, '2025-05-22 20:10:10'),
-(33, 'Nicolai', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:28:45'),
-(34, 'Nicolai', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:28:45'),
-(35, 'Nicolai', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:28:46'),
-(36, 'HAHAHA', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:30:14'),
-(37, 'HAHAHA', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:30:54'),
-(38, 'HAHAHA', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:31:05'),
-(39, 'Wiser', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:38:32'),
-(40, 'Nicolai', '', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:39:49'),
-(41, 'MOlly', '', NULL, 78.00, 0.00, 0.00, '2025-11-13 00:43:01'),
-(44, 'MOlly', 'GCash', NULL, 39.00, 0.00, 0.00, '2025-11-13 00:53:03'),
-(45, 'Nicole', 'GCash', NULL, 78.00, 0.00, 0.00, '2025-11-13 00:55:25'),
-(46, 'Jennie', 'GCash', NULL, 117.00, 0.00, 0.00, '2025-11-13 00:57:26'),
-(47, 'Nicole', 'GCash', NULL, 156.00, 0.00, 0.00, '2025-11-13 00:59:56');
+INSERT INTO `orders` (`id`, `customer_name`, `payment_mode`, `order_status`, `discount_type`, `discount_rate`, `discount_amount`, `final_total`, `gcash_reference`, `total`, `cash_received`, `change_due`, `created_at`) VALUES
+(54, 'jm', 'Cash', 'completed', NULL, 0.00, 0.00, 294.00, NULL, 294.00, 500.00, 206.00, '2026-04-17 01:25:42'),
+(55, ' KAI', 'Cash', 'completed', NULL, 0.00, 0.00, 40.00, NULL, 40.00, 100.00, 60.00, '2026-04-17 01:40:54'),
+(57, 'JM', 'GCash', 'completed', NULL, 0.00, 0.00, 117.00, 'ASdfhk123', 117.00, 0.00, 0.00, '2026-04-22 02:19:10'),
+(58, 'Zaidie', 'GCash', 'cancelled', NULL, 0.00, 0.00, 235.00, '1asdxdsqs', 235.00, 0.00, 0.00, '2026-04-22 02:48:42'),
+(59, 'jm', 'Cash', 'cancelled', NULL, 0.00, 0.00, 156.00, NULL, 156.00, 200.00, 44.00, '2026-04-22 03:37:07'),
+(61, 'jm', 'Cash', 'pending', NULL, 0.00, 0.00, 117.00, NULL, 117.00, 200.00, 83.00, '2026-04-22 03:39:50');
 
 -- --------------------------------------------------------
 
@@ -135,40 +148,25 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_name`, `category`, `size`, `quantity`, `price`) VALUES
-(32, 24, 'Iced Coffee Latte', '', '12oz', 1, 39.00),
-(33, 24, 'Cookies and Cream', '', '12oz', 1, 39.00),
-(34, 25, 'Milky Strawberry', '', '12oz', 1, 39.00),
-(35, 26, 'Milky Matcha', '', '12oz', 1, 39.00),
-(36, 27, 'Spanish Latte', '', '12oz', 1, 39.00),
-(37, 27, 'Milky Ube', '', '12oz', 1, 39.00),
-(38, 27, 'Dark Choco-ey', '', '12oz', 1, 39.00),
-(39, 28, 'Caramel Macchiato', '', '12oz', 1, 39.00),
-(40, 29, 'Milky Matcha', '', '12oz', 1, 39.00),
-(41, 29, 'White Choco-ey', '', '12oz', 1, 39.00),
-(42, 29, 'Cookies and Cream', '', '12oz', 1, 39.00),
-(43, 29, 'Java Chip', '', '12oz', 1, 39.00),
-(44, 30, 'Iced Coffee Latte', '', '12oz', 1, 39.00),
-(45, 30, 'Matcha Latte', '', '12oz', 1, 39.00),
-(46, 30, 'Milky Strawberry', '', '12oz', 1, 39.00),
-(47, 30, 'White Choco-ey', '', '12oz', 1, 39.00),
-(48, 30, 'Dark Choco-ey', '', '12oz', 1, 39.00),
-(49, 30, 'Java Chip', '', '12oz', 1, 39.00),
-(50, 31, 'Java Chip', '', '12oz', 1, 39.00),
-(53, 37, 'Spanish Latte', 'Coffee Series', '12oz', 1, 39.00),
-(54, 38, 'Spanish Latte', 'Coffee Series', '12oz', 1, 39.00),
-(55, 39, 'Caramel Macchiato', 'Coffee Series', '12oz', 1, 39.00),
-(56, 40, 'Iced Coffee Latte', 'Coffee Series', '12oz', 1, 39.00),
-(57, 41, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
-(58, 41, 'Milky Ube', 'Non-Coffee Series', '12oz', 1, 39.00),
-(63, 44, 'Rocky Road', 'Rookie Series', '12oz', 1, 39.00),
-(64, 45, 'Iced Coffee Latte', 'Coffee Series', '12oz', 1, 39.00),
-(65, 45, 'Caramel Macchiato', 'Coffee Series', '12oz', 1, 39.00),
-(66, 46, 'Milky Matcha', 'Non-Coffee Series', '12oz', 2, 39.00),
-(67, 46, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
-(68, 47, 'Matcha Latte', 'Coffee Series', '12oz', 1, 39.00),
-(69, 47, 'Milky Matcha', 'Non-Coffee Series', '12oz', 1, 39.00),
-(70, 47, 'Milky Strawberry', 'Non-Coffee Series', '12oz', 1, 39.00),
-(71, 47, 'White Choco-ey', 'Choco-Ey Series', '12oz', 1, 39.00);
+(86, 54, 'Blueberry Latte', '', '12oz', 1, 39.00),
+(87, 54, 'Green Apple Latte', '', '12oz', 1, 39.00),
+(88, 54, 'Strawberry Latte', '', '12oz', 1, 39.00),
+(89, 54, 'Green Apple Latte', '', '16oz', 1, 59.00),
+(90, 54, 'Strawberry Latte', '', '16oz', 1, 59.00),
+(91, 54, 'Blueberry Latte', '', '16oz', 1, 59.00),
+(92, 55, 'Green Apple Latte', '', '12oz', 1, 39.00),
+(93, 55, '1', '', '12oz', 1, 1.00),
+(116, 57, 'Blueberry Latte', '', '12oz', 1, 39.00),
+(117, 57, 'Green Apple Latte', '', '12oz', 1, 39.00),
+(118, 57, 'Strawberry Latte', '', '12oz', 1, 39.00),
+(119, 58, 'Blueberry Latte', '', '12oz', 1, 39.00),
+(120, 58, 'Green Apple Latte', '', '12oz', 1, 39.00),
+(121, 58, 'Strawberry Latte', '', '12oz', 1, 39.00),
+(122, 58, 'Blueberry Latte', '', '16oz', 1, 59.00),
+(123, 58, 'Green Apple Latte', '', '16oz', 1, 59.00),
+(124, 59, 'Strawberry Latte', '', '12oz', 4, 39.00),
+(143, 61, 'Blueberry Latte', 'Flavored Latte', '12oz', 1, 39.00),
+(144, 61, 'Strawberry Latte', 'Flavored Latte', '12oz', 2, 39.00);
 
 -- --------------------------------------------------------
 
@@ -187,15 +185,18 @@ CREATE TABLE `products` (
   `quantity` int(11) NOT NULL,
   `image` varchar(225) NOT NULL,
   `created_at` date NOT NULL DEFAULT current_timestamp(),
-  `status` tinyint(1) NOT NULL DEFAULT 0
+  `status` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `category_id`, `name`, `size`, `price_12oz`, `price_16oz`, `price`, `quantity`, `image`, `created_at`, `status`) VALUES
-(29, 1, 'Rocky Road', '12oz', 39.00, 49.00, 39, 100, 'assets/upload/products/1772121363.png', '2025-04-16', 0);
+INSERT INTO `products` (`id`, `category_id`, `name`, `size`, `price_12oz`, `price_16oz`, `price`, `quantity`, `image`, `created_at`, `status`, `deleted_at`) VALUES
+(31, 7, 'Blueberry Latte', '12oz', 39.00, 59.00, 39, 93, 'assets/upload/products/1773838691.png', '2026-03-17', 0, NULL),
+(32, 7, 'Green Apple Latte', '12oz', 39.00, 59.00, 39, 94, 'assets/upload/products/1773839033.png', '2026-03-18', 0, NULL),
+(33, 7, 'Strawberry Latte', '12oz', 39.00, 59.00, 39, 93, 'assets/upload/products/1773839121.png', '2026-03-18', 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -212,6 +213,13 @@ ALTER TABLE `cashier_staff`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `daily_quota`
+--
+ALTER TABLE `daily_quota`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_quota_date` (`quota_date`);
 
 --
 -- Indexes for table `orders`
@@ -240,31 +248,37 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `cashier_staff`
 --
 ALTER TABLE `cashier_staff`
-  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `daily_quota`
+--
+ALTER TABLE `daily_quota`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Constraints for dumped tables
