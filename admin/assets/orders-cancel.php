@@ -25,24 +25,25 @@ if (!$orderRes || mysqli_num_rows($orderRes) === 0) {
 }
 
 $order = mysqli_fetch_assoc($orderRes);
-if (strtolower((string)($order['order_status'] ?? 'pending')) === 'completed') {
+$currentStatus = strtolower((string)($order['order_status'] ?? 'pending'));
+if ($currentStatus === 'completed') {
     header('Location: orders.php?error=completed_locked');
     exit;
 }
 
-$items_query = "SELECT * FROM order_items WHERE order_id = $order_id";
-$items_result = mysqli_query($conn, $items_query);
+if ($currentStatus !== 'cancelled') {
+    $items_query = "SELECT * FROM order_items WHERE order_id = $order_id";
+    $items_result = mysqli_query($conn, $items_query);
 
-while ($item = mysqli_fetch_assoc($items_result)) {
-    $product_name = mysqli_real_escape_string($conn, $item['product_name']);
-    $quantity = (int)$item['quantity'];
-    mysqli_query($conn, "UPDATE products SET quantity = quantity + $quantity WHERE name = '$product_name'");
+    while ($item = mysqli_fetch_assoc($items_result)) {
+        $product_name = mysqli_real_escape_string($conn, $item['product_name']);
+        $quantity = (int)$item['quantity'];
+        mysqli_query($conn, "UPDATE products SET quantity = quantity + $quantity WHERE name = '$product_name'");
+    }
 }
 
-mysqli_query($conn, "DELETE FROM order_items WHERE order_id = $order_id");
-
-$delete_query = "DELETE FROM orders WHERE id = $order_id";
-if (mysqli_query($conn, $delete_query)) {
+$cancel_query = "UPDATE orders SET order_status = 'cancelled' WHERE id = $order_id LIMIT 1";
+if (mysqli_query($conn, $cancel_query)) {
     header('Location: orders.php?msg=cancelled');
 } else {
     header('Location: orders.php?msg=error');

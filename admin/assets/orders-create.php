@@ -67,7 +67,277 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     && !str_contains($paymongoSecretKey, 'actual_paymongo_secret_key');
 ?>
 
-<div class="hc-pos hc-order-screen">
+<style>
+    .hc-order-screen.hc-order-ref {
+        --ref-bg: #f7f2ec;
+        --ref-surface: #ffffff;
+        --ref-primary: var(--primary, #FF7A1A);
+        --ref-primary-deep: var(--primary-hover, #E96A0C);
+        --ref-border: #e9e3dc;
+        --ref-text: #3a342e;
+        --ref-muted: #8a8178;
+        max-width: 1520px;
+        margin: 0 auto;
+        padding: .5rem;
+        color: var(--ref-text);
+    }
+
+    .hc-order-ref .hc-order-board {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    .hc-order-ref .hc-order-main {
+        padding: 1.25rem;
+        border-radius: 28px;
+        border: 1px solid var(--ref-border);
+        background: var(--ref-bg);
+    }
+
+    .hc-order-ref .hc-order-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: .85rem;
+    }
+
+    .hc-order-ref .hc-order-search-inline {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-bottom: .95rem;
+    }
+
+    .hc-order-ref .hc-order-search-inline .form-control {
+        max-width: 460px;
+        min-height: 48px;
+        border-radius: 999px !important;
+        border: 1px solid var(--ref-border) !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .hc-order-ref .hc-order-filter-btn {
+        min-height: 46px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: var(--ref-primary);
+        color: #fff;
+        font-weight: 700;
+        padding: .55rem 1rem;
+    }
+
+    .hc-order-ref .hc-order-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .55rem;
+        margin-bottom: .9rem;
+    }
+
+    .hc-order-ref .hc-category-chip {
+        min-height: 40px;
+        border-radius: 999px;
+        border: 1px solid var(--ref-border);
+        background: #fff;
+        color: var(--ref-muted);
+        box-shadow: none;
+    }
+
+    .hc-order-ref .hc-category-chip.active {
+        background: var(--ref-primary);
+        color: #fff !important;
+        border-color: var(--ref-primary);
+    }
+
+    .hc-order-ref .hc-category-chip.active .hc-category-chip-count,
+    .hc-order-ref .hc-category-chip.active span {
+        color: #fff !important;
+    }
+
+    .hc-order-ref .hc-order-section-title {
+        margin: .2rem 0 .9rem;
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: var(--ref-text);
+    }
+
+    .hc-order-ref .hc-order-grid {
+        grid-template-columns: repeat(2, minmax(260px, 1fr)) !important;
+        gap: .95rem;
+    }
+
+    .hc-order-ref .product-card {
+        border-radius: 22px !important;
+        border: 1px solid var(--ref-border) !important;
+        background: #fff !important;
+        box-shadow: 0 10px 22px rgba(58, 52, 46, .06) !important;
+        padding: 1rem;
+        min-height: 210px;
+    }
+
+    .hc-order-ref .hc-product-actions {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: .55rem !important;
+        align-items: stretch !important;
+    }
+
+    .hc-order-ref .hc-inline-qty {
+        justify-content: center;
+        width: max-content;
+        margin: 0 auto;
+    }
+
+    .hc-order-ref .hc-product-head {
+        grid-template-columns: 90px minmax(0, 1fr) !important;
+        gap: .8rem;
+    }
+
+    .hc-order-ref .hc-product-thumb {
+        width: 90px;
+        height: 102px;
+        border-radius: 14px;
+        background: #faf7f3;
+    }
+
+    .hc-order-ref .product-name {
+        color: var(--ref-text) !important;
+        font-size: 1.08rem;
+        font-weight: 700;
+    }
+
+    .hc-order-ref .hc-product-cat {
+        color: var(--ref-muted) !important;
+        font-size: .78rem;
+        min-height: 2.2rem;
+    }
+
+    .hc-order-ref .hc-size-pill {
+        border-radius: 999px;
+        background: #fff !important;
+        border: 1px solid var(--ref-border) !important;
+        color: var(--ref-muted) !important;
+    }
+
+    .hc-order-ref .hc-size-pill.active {
+        background: var(--ref-primary) !important;
+        border-color: var(--ref-primary) !important;
+        color: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .hc-order-ref .hc-inline-qty {
+        background: #fff7f0;
+        border: 1px solid var(--ref-border);
+    }
+
+    .hc-order-ref .hc-inline-qty-btn {
+        background: #fff !important;
+        border: 1px solid var(--ref-border) !important;
+        color: var(--ref-text) !important;
+    }
+
+    .hc-order-ref .hc-add-cart-btn {
+        min-height: 40px;
+        border-radius: 999px !important;
+        background: var(--ref-primary) !important;
+        border: 1px solid var(--ref-primary) !important;
+        color: #fff !important;
+        font-weight: 700;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    .hc-order-ref .hc-order-side .hc-checkout {
+        position: sticky;
+        top: 1rem;
+        height: calc(100vh - 8rem);
+    }
+
+    .hc-order-ref .hc-order-panel {
+        height: 100%;
+        border-radius: 26px !important;
+        border: 1px solid var(--ref-border) !important;
+        background: #fff !important;
+        box-shadow: 0 12px 26px rgba(58, 52, 46, .08) !important;
+        padding: 1rem !important;
+    }
+
+    .hc-order-ref .hc-cart-head h3 {
+        font-size: 2rem;
+        color: var(--ref-text);
+    }
+
+    .hc-order-ref .hc-cart-head p,
+    .hc-order-ref .hc-order-label,
+    .hc-order-ref .hc-order-summary-row {
+        color: var(--ref-muted);
+    }
+
+    .hc-order-ref .selected-product-row {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto auto;
+        gap: .55rem;
+        align-items: center;
+        padding: .65rem 0;
+        border-bottom: 1px solid var(--ref-border);
+    }
+
+    .hc-order-ref .cart-item-thumb {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--ref-border);
+        background: #faf7f3;
+    }
+
+    .hc-order-ref .cart-item-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hc-order-ref .hc-order-summary-total strong {
+        color: var(--ref-primary-deep);
+        font-size: 1.6rem;
+    }
+
+    .hc-order-ref .hc-order-submit {
+        min-height: 52px;
+        border-radius: 999px !important;
+        background: var(--ref-primary) !important;
+        border: 1px solid var(--ref-primary) !important;
+        box-shadow: none !important;
+    }
+
+    @media (max-width: 1199px) {
+        .hc-order-ref .hc-order-grid {
+            grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .hc-order-screen.hc-order-ref {
+            padding: .2rem;
+        }
+        .hc-order-ref .hc-order-board {
+            grid-template-columns: 1fr;
+        }
+        .hc-order-ref .hc-order-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .hc-order-ref .hc-order-side .hc-checkout {
+            position: static;
+            height: auto;
+        }
+    }
+</style>
+
+<div class="hc-pos hc-order-screen hc-order-ref">
     <?php alertMessage(); ?>
 
     <form action="place_order.php" method="POST" id="orderForm">
@@ -85,6 +355,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
 
                 <div class="hc-order-search-inline">
                     <input type="text" id="productSearchInput" class="form-control" placeholder="Search product by name...">
+                    <button type="button" class="hc-order-filter-btn"><i class="fas fa-sliders-h me-1"></i>Filter</button>
                 </div>
 
                 <div class="hc-order-filter-row">
@@ -104,6 +375,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                 </div>
 
                 <div class="hc-pos-catalog">
+                    <h2 class="hc-order-section-title">Coffee menu</h2>
                     <?php if ($products && mysqli_num_rows($products) > 0): ?>
                         <div class="hc-product-grid hc-order-grid">
                             <?php while ($item = mysqli_fetch_assoc($products)): ?>
@@ -122,6 +394,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                                          data-name="<?= htmlspecialchars($item['name']) ?>"
                                          data-price12="<?= htmlspecialchars((string)$price12) ?>"
                                          data-price16="<?= htmlspecialchars((string)$price16) ?>"
+                                         data-image="<?= htmlspecialchars($imageUrl) ?>"
                                          data-quantity="<?= (int) $item['quantity'] ?>"
                                          <?= (int) $item['quantity'] === 0 ? 'data-disabled="true"' : '' ?>>
                                         <div class="hc-product-head">
@@ -313,6 +586,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                 <input type="hidden" name="products[${lineKey}][name]" value="${prod.name}">
                 <input type="hidden" name="products[${lineKey}][size]" value="${prod.size}" id="hidden-size-${lineKey}">
             ` : `
+                <div class="cart-item-thumb">${prod.image ? `<img src="${prod.image}" alt="${prod.name}">` : ''}</div>
                 <div class="product-title">
                     <div class="cart-item-name">${prod.name}</div>
                     <div class="cart-item-size-text">${prod.size}</div>
@@ -438,6 +712,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             const price12 = Number.isFinite(rawPrice12) ? rawPrice12 : 0;
             const price16 = Number.isFinite(rawPrice16) ? rawPrice16 : price12;
             const maxQuantity = parseInt(card.dataset.quantity);
+            const image = card.dataset.image || '';
             const lineKey = lineKeyOf(id, chosenSize);
             let selectedQty = selectedQtyForProduct(id);
             let availableQty = maxQuantity - selectedQty;
@@ -459,7 +734,8 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                     price16: price16,
                     unitPrice: chosenSize === '16oz' ? price16 : price12,
                     quantity: requestedQty,
-                    maxQuantity: maxQuantity
+                    maxQuantity: maxQuantity,
+                    image: image
                 };
             }
             renderSelectedProducts();

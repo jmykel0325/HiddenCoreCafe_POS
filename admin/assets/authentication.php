@@ -33,6 +33,7 @@ if(isset($_SESSION['loggedIn'])){
             'orders-view.php',
             'orders-edit.php',
             'orders-complete.php',
+            'sales-report.php',
             'place_order.php',
             'paymongo-create-source.php',
             'paymongo-payment-success.php',

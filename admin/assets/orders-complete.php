@@ -20,7 +20,7 @@ if (!$orderRes || mysqli_num_rows($orderRes) === 0) {
 }
 
 $order = mysqli_fetch_assoc($orderRes);
-if (strtolower((string)($order['order_status'] ?? 'pending')) === 'completed') {
+if (in_array(strtolower((string)($order['order_status'] ?? 'pending')), ['completed', 'cancelled'], true)) {
     header('Location: orders.php?msg=already_completed');
     exit();
 }

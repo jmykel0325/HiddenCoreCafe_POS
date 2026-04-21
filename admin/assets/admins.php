@@ -2,7 +2,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 hc-admin-page hc-admins-page">
     <div class="card mt-4 shadow-sm">
         <div class="card-header">
             <h4 class="mb-0">
@@ -46,7 +46,11 @@
                             <td><?= $cashier_staffItem['last_name'] ?></td>
                             <td><?= $cashier_staffItem['email'] ?></td>
                             <td><?= $cashier_staffItem['username'] ?></td>
-                            <td><?= $cashier_staffItem['position'] ?></td>
+                            <td>
+                                <span class="badge <?= strcasecmp((string)$cashier_staffItem['position'], 'Owner') === 0 ? 'bg-warning text-dark' : 'bg-success' ?>">
+                                    <?= htmlspecialchars($cashier_staffItem['position']) ?>
+                                </span>
+                            </td>
                             <td>
                                 <a href="cashier_staff-edit.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-success btn-sm">Edit</a>
                                 <?php if($isSelfOwner): ?>
@@ -70,3 +74,4 @@
 </div>
 
 <?php include('includes/footer.php'); ?>
+

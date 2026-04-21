@@ -12,11 +12,7 @@ if(isset($_SESSION['loggedIn'])){
 <style>
     body {
         min-height: 100vh;
-        background:
-            radial-gradient(circle at top right, rgba(255, 189, 138, 0.35), transparent 28%),
-            linear-gradient(rgba(247, 241, 235, 0.9), rgba(247, 241, 235, 0.95)),
-            url('login_bg.png') no-repeat center center fixed;
-        background-size: cover;
+        background: #f1ebe2;
     }
 
     .login-shell {
@@ -25,31 +21,6 @@ if(isset($_SESSION['loggedIn'])){
         padding: 3rem 1.25rem 4rem;
         display: flex;
         align-items: center;
-    }
-
-    .login-shell::before,
-    .login-shell::after {
-        content: "";
-        position: absolute;
-        border-radius: 999px;
-        pointer-events: none;
-        filter: blur(8px);
-    }
-
-    .login-shell::before {
-        width: 220px;
-        height: 220px;
-        top: 7%;
-        right: 8%;
-        background: rgba(255, 122, 26, 0.12);
-    }
-
-    .login-shell::after {
-        width: 280px;
-        height: 280px;
-        bottom: 2%;
-        left: 4%;
-        background: rgba(15, 23, 42, 0.08);
     }
 
     .login-grid {
