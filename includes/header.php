@@ -79,4 +79,4 @@ require_once __DIR__ . '/../config/function.php';
 </head>
  <body>
 
-    <?php include('navbar.php') ?>
+    <?php if (!isset($hideNavbar) || !$hideNavbar) { include('navbar.php'); } ?>

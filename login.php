@@ -1,5 +1,6 @@
 <?php 
 
+$hideNavbar = true;
 include('includes/header.php');
 
 if(isset($_SESSION['loggedIn'])){
@@ -10,242 +11,201 @@ if(isset($_SESSION['loggedIn'])){
 ?>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+    :root {
+        --login-bg: #f7f2ec;
+        --login-surface: #ffffff;
+        --login-primary: #ff7a1a;
+        --login-primary-hover: #e96a0c;
+        --login-primary-light: #fff1e6;
+        --login-border: #e9e3dc;
+        --login-text-dark: #1f2a44;
+        --login-text-muted: #7a726b;
+    }
+    * { font-family: 'Poppins', sans-serif; }
     body {
         min-height: 100vh;
-        background: #f1ebe2;
+        background: radial-gradient(circle at 14% 14%, #fff7ef 0%, #f7f2ec 42%, #f2ece4 100%);
+        color: var(--login-text-dark);
+    }
+    .hc-login-shell {
+        min-height: 100vh;
+        padding: 2rem 1.25rem;
+        display: grid;
+        place-items: center;
+    }
+    .hc-login-wrap {
+        width: min(1200px, 100%);
+        min-height: min(760px, calc(100vh - 4rem));
+        border-radius: 30px;
+        overflow: hidden;
+        border: 1px solid var(--login-border);
+        box-shadow: 0 28px 64px rgba(37, 23, 15, 0.16);
+        background: var(--login-surface);
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+    }
+    .hc-login-left {
+        position: relative;
+        padding: 2.6rem 2.3rem;
+        background:
+            radial-gradient(circle at 82% 16%, rgba(255, 122, 26, 0.26) 0%, rgba(255, 122, 26, 0) 34%),
+            radial-gradient(circle at 14% 88%, rgba(255, 174, 92, 0.2) 0%, rgba(255, 174, 92, 0) 33%),
+            linear-gradient(145deg, #fff7ef 0%, #f6ede4 100%);
+        border-right: 1px solid var(--login-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hc-login-brand-showcase {
+        text-align: center;
+        max-width: 360px;
+        width: 100%;
+    }
+    .hc-login-brand-icon {
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 1.1rem;
+        border-radius: 50%;
+        border: 2px solid #ffd2b3;
+        background: #fff7ef;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 14px 26px rgba(255, 122, 26, 0.12);
+    }
+    .hc-login-brand-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .hc-login-brand-title {
+        margin: 0;
+        color: var(--login-text-dark);
+        font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+    .hc-login-brand-subtitle {
+        margin: 0.35rem 0 0;
+        color: var(--login-text-muted);
+        font-size: 0.82rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 600;
     }
 
-    .login-shell {
-        position: relative;
-        min-height: calc(100vh - 73px);
-        padding: 3rem 1.25rem 4rem;
+    .hc-login-right {
+        background: #fffdfa;
+        padding: 2.35rem 2.1rem;
         display: flex;
         align-items: center;
     }
-
-    .login-grid {
-        position: relative;
-        z-index: 1;
+    .hc-login-card {
         width: 100%;
-        max-width: 1180px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(360px, 460px);
-        gap: 2rem;
-        align-items: center;
+        border-radius: 24px;
+        border: 1px solid var(--login-border);
+        background: var(--login-surface);
+        box-shadow: 0 18px 36px rgba(30, 20, 14, 0.08);
+        padding: 1.9rem;
     }
-
-    .login-hero {
-        padding: 2rem 1rem 2rem 0;
-    }
-
-    .login-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.45rem 0.85rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(15, 23, 42, 0.08);
-        color: #e76300;
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-    }
-
-    .login-title {
-        margin: 1.2rem 0 0;
-        color: #102341;
-        font-size: clamp(2.5rem, 6vw, 4.3rem);
-        font-weight: 900;
-        letter-spacing: -0.05em;
-        line-height: 0.95;
-    }
-
-    .login-copy {
-        max-width: 560px;
-        margin: 1.1rem 0 0;
-        color: #5b6474;
-        font-size: 1.02rem;
-    }
-
-    .login-points {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        max-width: 640px;
-        margin-top: 1.8rem;
-    }
-
-    .login-point {
-        padding: 1rem 1.1rem;
-        border-radius: 22px;
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(15, 23, 42, 0.08);
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
-    }
-
-    .login-point strong {
-        display: block;
-        color: #0f172a;
-        font-size: 1rem;
-        font-weight: 800;
-    }
-
-    .login-point span {
-        display: block;
-        margin-top: 0.35rem;
-        color: #64748b;
-        font-size: 0.92rem;
-    }
-
-    .login-card {
-        position: relative;
-        z-index: 1;
-        padding: 2rem;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(15, 23, 42, 0.1);
-        box-shadow: 0 28px 60px rgba(15, 23, 42, 0.14);
-        backdrop-filter: blur(18px);
-    }
-
-    .login-card-header {
-        margin-bottom: 1.5rem;
-    }
-
-    .login-card-title {
+    .hc-login-card h2 {
         margin: 0;
-        color: #0f172a;
+        font-weight: 800;
+        color: var(--login-text-dark);
         font-size: 2rem;
-        font-weight: 900;
         letter-spacing: -0.03em;
     }
-
-    .login-card-subtitle {
-        margin: 0.4rem 0 0;
-        color: #64748b;
-        font-size: 0.96rem;
+    .hc-login-subtitle {
+        margin-top: 0.35rem;
+        color: var(--login-text-muted);
+        font-size: 0.92rem;
     }
-
-    .login-form label {
-        margin-bottom: 0.45rem;
-        color: #334155;
-        font-weight: 800;
+    .hc-login-card .alert {
+        border-radius: 12px;
+        border: 1px solid var(--login-border);
+        margin-bottom: 1rem;
     }
-
-    .login-form .form-control {
-        min-height: 54px;
-        border-radius: 18px;
-        border: 1px solid rgba(15, 23, 42, 0.12);
-        background: #ffffff;
-        color: #0f172a;
-        padding: 0.9rem 1rem;
-        box-shadow: none;
+    .hc-login-form { margin-top: 1.15rem; }
+    .hc-login-form label {
+        margin-bottom: 0.42rem;
+        font-size: 0.88rem;
+        color: #433a31;
+        font-weight: 600;
     }
-
-    .login-form .form-control:focus {
-        border-color: rgba(255, 122, 26, 0.65);
-        box-shadow: 0 0 0 0.22rem rgba(255, 122, 26, 0.14);
+    .hc-login-form .form-control {
+        min-height: 50px;
+        border-radius: 13px;
+        border: 1px solid var(--login-border);
+        background: #fffdf9;
+        color: var(--login-text-dark);
+        padding: 0.8rem 0.92rem;
+        font-weight: 500;
     }
-
-    .login-submit {
-        min-height: 54px;
+    .hc-login-form .form-control:focus {
+        border-color: var(--login-primary);
+        box-shadow: 0 0 0 0.18rem rgba(255, 122, 26, 0.17);
+        background: #fff;
+    }
+    .hc-login-submit {
+        margin-top: 0.25rem;
+        width: 100%;
+        min-height: 50px;
+        border-radius: 999px;
         border: 0;
-        background: linear-gradient(90deg, #ff7a1a 0%, #ff9f5f 100%) !important;
-        box-shadow: 0 18px 28px rgba(255, 122, 26, 0.22);
+        background: var(--login-primary) !important;
+        color: #fff !important;
+        font-weight: 700;
+        box-shadow: 0 14px 24px rgba(255, 122, 26, 0.28);
     }
+    .hc-login-submit:hover { background: var(--login-primary-hover) !important; }
 
-    .login-submit:hover {
-        filter: brightness(0.98);
+    @media (max-width: 1024px) {
+        .hc-login-wrap { grid-template-columns: 1fr; }
+        .hc-login-left { border-right: 0; border-bottom: 1px solid var(--login-border); }
     }
-
-    .login-card .alert {
-        margin-bottom: 1.25rem;
-        border: 0;
-        border-radius: 18px;
-    }
-
-    @media (max-width: 991.98px) {
-        .login-grid {
-            grid-template-columns: 1fr;
+    @media (max-width: 768px) {
+        .hc-login-shell { padding: 1rem 0.75rem; }
+        .hc-login-wrap {
+            min-height: auto;
+            border-radius: 20px;
         }
-
-        .login-hero {
-            padding: 0;
-        }
-    }
-
-    @media (max-width: 767.98px) {
-        .login-shell {
-            padding-top: 2rem;
-        }
-
-        .login-card {
-            padding: 1.5rem;
-            border-radius: 24px;
-        }
-
-        .login-points {
-            grid-template-columns: 1fr;
-        }
-
-        .login-title {
-            font-size: 2.4rem;
-        }
+        .hc-login-left, .hc-login-right { padding: 1.35rem; }
+        .hc-login-card { padding: 1.2rem; border-radius: 18px; }
     }
 </style>
-
-<section class="login-shell">
-    <div class="login-grid">
-        <div class="login-hero">
-            <div class="login-kicker">Hidden Core Cafe POS</div>
-            <h1 class="login-title">One login flow. One visual system.</h1>
-            <p class="login-copy">
-                The sign-in page now follows the dashboard style with warm accents, soft surfaces, and a clearer entry point for staff access.
-            </p>
-
-            <div class="login-points">
-                <div class="login-point">
-                    <strong>Dashboard-aligned UI</strong>
-                    <span>Uses the same orange accent, rounded cards, and lighter admin-inspired layout.</span>
+<section class="hc-login-shell">
+    <div class="hc-login-wrap">
+        <div class="hc-login-left">
+            <div class="hc-login-brand-showcase">
+                <span class="hc-login-brand-icon">
+                    <img src="/HiddenCoreCafe_POS/LOGO.jpg" alt="Hidden Core Cafe Logo">
+                </span>
+                <h1 class="hc-login-brand-title">Hidden Core Cafe</h1>
+                <p class="hc-login-brand-subtitle">Cafe Management System</p>
                 </div>
-                <div class="login-point">
-                    <strong>Single access point</strong>
-                    <span>The navbar login now goes directly to this page instead of opening a second login design.</span>
-                </div>
-            </div>
         </div>
-
-        <div class="login-card">
-            <?php alertMessage(); ?>
-
-            <div class="login-card-header">
-                <h2 class="login-card-title">Staff Login</h2>
-                <p class="login-card-subtitle">Sign in to continue to the POS dashboard.</p>
-            </div>
-
-            <form action="login-code.php" method="POST" class="login-form">
-                <div class="mb-3">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" required />
-                </div>
-                <div class="mt-4">
-                    <button type="submit" name="loginBtn" class="btn btn-primary login-submit w-100">
+        <div class="hc-login-right">
+            <div class="hc-login-card">
+                <?php alertMessage(); ?>
+                <h2>Staff Login</h2>
+                <p class="hc-login-subtitle">Sign in to access Hidden Core Cafe POS.</p>
+                <form action="login-code.php" method="POST" class="hc-login-form">
+                    <div class="mb-3">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" required />
+                    </div>
+                    <button type="submit" name="loginBtn" class="btn hc-login-submit">
                         Log in
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
+                </div>
 </section>
 
 <?php include('includes/footer.php');
-
-?>
