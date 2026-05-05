@@ -52,6 +52,10 @@ $total_items_sold = mysqli_fetch_assoc(mysqli_query($conn, "
 $total_cashiers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total_cashiers FROM cashier_staff"))['total_cashiers'] ?? 0;
 $total_categories = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total_categories FROM categories"))['total_categories'] ?? 0;
 $total_products = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total_products FROM products"))['total_products'] ?? 0;
+$todayQuotaSold = getTodaySoldCups();
+$todayQuotaTarget = getTodayQuotaTarget();
+$todayQuotaPercent = $todayQuotaTarget > 0 ? min(100, max(0, round(($todayQuotaSold / $todayQuotaTarget) * 100))) : 0;
+$todayQuotaRemaining = max(0, $todayQuotaTarget - $todayQuotaSold);
 
 $daily_sales_result = mysqli_query($conn, "
     SELECT DATE(created_at) as sale_date, SUM(total) as daily_total
@@ -154,6 +158,13 @@ $stats = [
         'accent' => 'is-neutral',
     ],
     [
+        'label' => "Today's Quota",
+        'value' => number_format((int) $todayQuotaSold) . '/' . number_format((int) $todayQuotaTarget),
+        'meta' => $todayQuotaTarget > 0 ? number_format((int) $todayQuotaRemaining) . ' cups remaining today' : 'Set a target for today',
+        'icon' => 'fas fa-bullseye',
+        'accent' => 'is-soft',
+    ],
+    [
         'label' => 'Cashier/Staff',
         'value' => number_format((int) $total_cashiers),
         'meta' => 'Active team records',
@@ -170,7 +181,7 @@ $stats = [
     [
         'label' => 'Products',
         'value' => number_format((int) $total_products),
-        'meta' => 'Products in inventory',
+        'meta' => 'Products on the menu',
         'icon' => 'fas fa-mug-hot',
         'accent' => 'is-soft',
     ],
@@ -236,6 +247,76 @@ $stats = [
 
     .hc-dashboard-ref .hc-dashboard-hero-badge strong {
         color: #f8f7f4 !important;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: .9rem;
+        align-items: center;
+        padding: 1rem 1.1rem;
+        border-radius: 22px;
+        border: 1px solid var(--dash-border);
+        background: #ffffff;
+        box-shadow: 0 12px 22px rgba(58, 52, 46, .06);
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-copy {
+        display: flex;
+        align-items: center;
+        gap: .9rem;
+        min-width: 0;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-icon {
+        width: 46px;
+        height: 46px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 46px;
+        border-radius: 15px;
+        background: #fff2e7;
+        color: var(--dash-primary-deep);
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-title {
+        margin: 0;
+        color: var(--dash-text);
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-meta {
+        margin: .2rem 0 0;
+        color: var(--dash-muted);
+        font-size: .9rem;
+        font-weight: 600;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-form {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        justify-content: flex-end;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-input {
+        width: 136px;
+        min-height: 42px;
+        border-radius: 14px !important;
+        border: 1px solid #eadfce !important;
+        background: #fffdfb !important;
+        padding: .45rem .7rem;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .hc-dashboard-ref .hc-quota-admin-btn {
+        min-height: 42px;
+        border-radius: 14px !important;
+        padding: .45rem .85rem !important;
+        font-weight: 800 !important;
     }
 
     .hc-dashboard-ref .hc-dashboard-stats {
@@ -571,6 +652,14 @@ $stats = [
             border-radius: 24px;
             padding: 1.15rem;
         }
+        .hc-dashboard-ref .hc-quota-admin {
+            grid-template-columns: 1fr;
+            align-items: stretch;
+        }
+        .hc-dashboard-ref .hc-quota-admin-form {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
         .hc-dashboard-ref .hc-dashboard-stats {
             grid-template-columns: 1fr;
         }
@@ -600,6 +689,39 @@ $stats = [
             <strong>Open and tracking</strong>
         </div>
     </section>
+
+    <?php alertMessage(); ?>
+
+    <?php if (!$isCashierView): ?>
+    <section class="hc-quota-admin">
+        <div class="hc-quota-admin-copy">
+            <div class="hc-quota-admin-icon"><i class="fas fa-bullseye"></i></div>
+            <div>
+                <h2 class="hc-quota-admin-title">Today's Cup Quota</h2>
+                <p class="hc-quota-admin-meta">
+                    <?= number_format((int)$todayQuotaSold) ?> sold of <?= number_format((int)$todayQuotaTarget) ?> target
+                    <?php if ($todayQuotaTarget > 0): ?>
+                        &middot; <?= number_format((float)$todayQuotaPercent, 0) ?>%
+                    <?php endif; ?>
+                </p>
+            </div>
+        </div>
+        <form action="quota-update.php" method="POST" class="hc-quota-admin-form">
+            <input
+                type="number"
+                name="quota_target"
+                class="form-control hc-quota-admin-input"
+                min="1"
+                step="1"
+                required
+                value="<?= $todayQuotaTarget > 0 ? (int)$todayQuotaTarget : '' ?>"
+                placeholder="Cups"
+                aria-label="Today quota target"
+            >
+            <button type="submit" class="btn btn-primary hc-quota-admin-btn">Save Quota</button>
+        </form>
+    </section>
+    <?php endif; ?>
 
     <section class="hc-dashboard-stats">
         <?php foreach ($stats as $stat): ?>

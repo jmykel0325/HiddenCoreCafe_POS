@@ -1,6 +1,33 @@
 <?php include ('includes/header.php'); ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .hc-admins-page table.table tbody td:last-child {
+        min-width: 124px;
+    }
+
+    .hc-admins-page .hc-action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .34rem;
+        align-items: center;
+        min-width: max-content;
+    }
+
+    .hc-admins-page .hc-action-row .btn.btn-sm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: 52px;
+        min-height: 30px !important;
+        padding: .22rem .62rem !important;
+        font-size: .76rem !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        white-space: nowrap;
+    }
+</style>
 
 <div class="container-fluid px-4 hc-admin-page hc-admins-page">
     <div class="card mt-4 shadow-sm">
@@ -52,12 +79,14 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="cashier_staff-edit.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-success btn-sm">Edit</a>
-                                <?php if($isSelfOwner): ?>
-                                    <button type="button" class="btn btn-danger btn-sm" disabled title="Owner cannot delete own account">Delete</button>
-                                <?php else: ?>
-                                    <a href="cashier_staff-delete.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                                <?php endif; ?>
+                                <div class="hc-action-row">
+                                    <a href="cashier_staff-edit.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-success btn-sm">Edit</a>
+                                    <?php if($isSelfOwner): ?>
+                                        <button type="button" class="btn btn-danger btn-sm" disabled title="Owner cannot delete own account">Delete</button>
+                                    <?php else: ?>
+                                        <a href="cashier_staff-delete.php?id=<?= $cashier_staffItem['id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>

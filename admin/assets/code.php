@@ -231,7 +231,6 @@ if(isset($_POST['saveProduct']))
     $name = validate($_POST['name']);
     $price_12oz = validate($_POST['price_12oz'] ?? '');
     $price_16oz = validate($_POST['price_16oz'] ?? '');
-    $quantity = validate($_POST['quantity']);
     $status = isset($_POST['status']) == true ? 1:0;
 
     if ($price_12oz === '' || $price_16oz === '') {
@@ -267,8 +266,6 @@ if(isset($_POST['saveProduct']))
         'name' => $name,
         'size' => '12oz',
         'price' => $price_12oz,
-
-        'quantity' => $quantity,
         'image' => $finalImage,
         'status' => $status
     ];
@@ -300,7 +297,6 @@ if(isset($_POST['updateProduct']))
     $name = validate($_POST['name']);
     $price_12oz = validate($_POST['price_12oz'] ?? '');
     $price_16oz = validate($_POST['price_16oz'] ?? '');
-    $quantity = validate($_POST['quantity']);
     $status = isset($_POST['status']) == true ? 1:0;
 
     if ($price_12oz === '' || $price_16oz === '') {
@@ -345,8 +341,6 @@ if(isset($_POST['updateProduct']))
         'name' => $name,
         'size' => '12oz',
         'price' => $price_12oz,
-    
-        'quantity' => $quantity,
         'image' => $finalImage,
         'status' => $status
     ];

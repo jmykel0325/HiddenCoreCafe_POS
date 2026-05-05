@@ -36,7 +36,7 @@ $items_result = mysqli_query($conn, $items_query);
 $order_items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
 
 // Get all products for adding new items
-$products_query = "SELECT id, name, image, price, price_12oz, price_16oz, quantity, category_id FROM products WHERE deleted_at IS NULL AND (status = 0 OR status IS NULL) ORDER BY name";
+$products_query = "SELECT id, name, image, price, price_12oz, price_16oz, category_id FROM products WHERE deleted_at IS NULL AND (status = 0 OR status IS NULL) ORDER BY name";
 $products_result = mysqli_query($conn, $products_query);
 $products = mysqli_fetch_all($products_result, MYSQLI_ASSOC);
 $productById = [];
@@ -75,13 +75,6 @@ if (isset($_POST['update_order'])) {
     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
     $payment_mode = mysqli_real_escape_string($conn, $_POST['payment_mode']);
     $gcash_reference = isset($_POST['gcash_reference']) ? mysqli_real_escape_string($conn, $_POST['gcash_reference']) : '';
-    // Restore original quantities before updating
-    foreach ($order_items as $item) {
-        $restore_qty = intval($item['quantity']);
-        $prod_name = mysqli_real_escape_string($conn, $item['product_name']);
-        mysqli_query($conn, "UPDATE products SET quantity = quantity + $restore_qty WHERE name = '$prod_name'");
-    }
-    
     // Delete old order items
     mysqli_query($conn, "DELETE FROM order_items WHERE order_id = $order_id");
     
@@ -130,13 +123,6 @@ if (isset($_POST['update_order'])) {
         mysqli_query($conn, "INSERT INTO order_items (order_id, product_name, category, size, quantity, price) 
                             VALUES ($order_id, '$product_name', '$category', '$size', $qty, $unitPrice)");
 
-        // Deduct quantity
-        if ($prod_id > 0) {
-            mysqli_query($conn, "UPDATE products SET quantity = quantity - $qty WHERE id = $prod_id");
-        } else {
-            mysqli_query($conn, "UPDATE products SET quantity = quantity - $qty WHERE name = '$product_name' LIMIT 1");
-        }
-        
         $total += $qty * $unitPrice;
     }
     
@@ -433,14 +419,12 @@ if (isset($_POST['update_order'])) {
                                 $price16 = (float)($item['price_16oz'] ?? $item['price']);
                             ?>
                             <div class="hc-product-cell">
-                                <div class="product-card <?= (int) $item['quantity'] === 0 ? 'out-of-stock' : '' ?>"
+                                <div class="product-card"
                                      data-id="<?= (int) $item['id'] ?>"
                                      data-name="<?= htmlspecialchars($item['name']) ?>"
                                      data-price12="<?= htmlspecialchars((string)$price12) ?>"
                                      data-price16="<?= htmlspecialchars((string)$price16) ?>"
-                                     data-image="<?= htmlspecialchars($imageUrl) ?>"
-                                     data-quantity="<?= (int) $item['quantity'] ?>"
-                                     <?= (int) $item['quantity'] === 0 ? 'data-disabled="true"' : '' ?>>
+                                     data-image="<?= htmlspecialchars($imageUrl) ?>">
                                     <div class="hc-product-head">
                                         <div class="hc-product-media hc-product-thumb">
                                             <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-image">
@@ -560,7 +544,6 @@ if (isset($_POST['update_order'])) {
                 price16: <?= (float)($item['price'] ?? 0) ?>,
                 unitPrice: <?= (float)($item['price'] ?? 0) ?>,
                 quantity: <?= (int)($item['quantity'] ?? 1) ?>,
-                maxQuantity: 999,
                 image: existingImage
             };
         })();
@@ -667,17 +650,12 @@ if (isset($_POST['update_order'])) {
     }
 
     function addProductToOrder(card, chosenSize = '12oz', qtyToAdd = 1) {
-        if (card.dataset.disabled === 'true') {
-            alert('Sorry, this product is currently out of stock.');
-            return;
-        }
         const id = card.dataset.id;
         const name = card.dataset.name;
         const rawPrice12 = parseFloat(card.dataset.price12);
         const rawPrice16 = parseFloat(card.dataset.price16);
         const price12 = Number.isFinite(rawPrice12) ? rawPrice12 : 0;
         const price16 = Number.isFinite(rawPrice16) ? rawPrice16 : price12;
-        const maxQuantity = parseInt(card.dataset.quantity);
         const image = card.dataset.image || '';
         const lineKey = lineKeyOf(id, chosenSize, name);
         const requestedQty = Math.max(1, parseInt(qtyToAdd) || 1);
@@ -693,7 +671,6 @@ if (isset($_POST['update_order'])) {
                 price16: price16,
                 unitPrice: chosenSize === '16oz' ? price16 : price12,
                 quantity: requestedQty,
-                maxQuantity: maxQuantity,
                 image: image
             };
         }
@@ -722,8 +699,7 @@ if (isset($_POST['update_order'])) {
             incBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const current = parseInt(qtyInput.value) || 1;
-                const max = parseInt(card.dataset.quantity) || 1;
-                qtyInput.value = String(Math.min(max, current + 1));
+                qtyInput.value = String(current + 1);
             });
         }
 

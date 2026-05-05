@@ -198,9 +198,6 @@ if (isset($_POST['place_order'])) {
             }
             mysqli_query($conn, $item_query);
 
-            // Update the product quantity in the products table
-            $update_query = "UPDATE products SET quantity = quantity - $qty WHERE id = $prod_id";
-            mysqli_query($conn, $update_query);
         }
 
         // Show a centered toast notification and redirect after a short delay

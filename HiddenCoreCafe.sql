@@ -182,7 +182,6 @@ CREATE TABLE `products` (
   `price_12oz` decimal(10,2) NOT NULL DEFAULT 0.00,
   `price_16oz` decimal(10,2) NOT NULL DEFAULT 0.00,
   `price` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
   `image` varchar(225) NOT NULL,
   `created_at` date NOT NULL DEFAULT current_timestamp(),
   `status` tinyint(1) NOT NULL DEFAULT 0,
@@ -193,10 +192,10 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `category_id`, `name`, `size`, `price_12oz`, `price_16oz`, `price`, `quantity`, `image`, `created_at`, `status`, `deleted_at`) VALUES
-(31, 7, 'Blueberry Latte', '12oz', 39.00, 59.00, 39, 93, 'assets/upload/products/1773838691.png', '2026-03-17', 0, NULL),
-(32, 7, 'Green Apple Latte', '12oz', 39.00, 59.00, 39, 94, 'assets/upload/products/1773839033.png', '2026-03-18', 0, NULL),
-(33, 7, 'Strawberry Latte', '12oz', 39.00, 59.00, 39, 93, 'assets/upload/products/1773839121.png', '2026-03-18', 0, NULL);
+INSERT INTO `products` (`id`, `category_id`, `name`, `size`, `price_12oz`, `price_16oz`, `price`, `image`, `created_at`, `status`, `deleted_at`) VALUES
+(31, 7, 'Blueberry Latte', '12oz', 39.00, 59.00, 39, 'assets/upload/products/1773838691.png', '2026-03-17', 0, NULL),
+(32, 7, 'Green Apple Latte', '12oz', 39.00, 59.00, 39, 'assets/upload/products/1773839033.png', '2026-03-18', 0, NULL),
+(33, 7, 'Strawberry Latte', '12oz', 39.00, 59.00, 39, 'assets/upload/products/1773839121.png', '2026-03-18', 0, NULL);
 
 --
 -- Indexes for dumped tables

@@ -847,11 +847,6 @@ img[src*="Logo.jpg"]{
   position:relative;
 }
 
-.product-card.out-of-stock{
-  filter:grayscale(100%);
-  cursor:not-allowed;
-}
-
 .product-image{
   width:100%;
   height:200px;
@@ -1007,19 +1002,6 @@ img[src*="Logo.jpg"]{
 
 .selected-product-row .remove-btn{
   margin-left:.25rem;
-}
-
-.out-of-stock-overlay{
-  position:absolute;
-  inset:0;
-  background:rgba(15,23,42,.62);
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:1.05rem;
-  font-weight:800;
-  border-radius:var(--hc-radius);
 }
 
 .notif-toast{
@@ -1776,12 +1758,6 @@ img[src*="Logo.jpg"]{
   color:#ff5b12;
   font-size:1.18rem;
   font-weight:900;
-}
-
-.hc-order-screen .out-of-stock-overlay{
-  border-radius:10px;
-  background:rgba(15,23,42,.62);
-  backdrop-filter:blur(2px);
 }
 
 .hc-order-screen .product-card .btn-outline-secondary{

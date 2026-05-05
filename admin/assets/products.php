@@ -130,10 +130,11 @@
     }
 
     .hc-products-ref .btn.btn-sm {
-        min-height: 34px !important;
-        padding: .3rem .72rem !important;
-        font-size: .79rem !important;
+        min-height: 30px !important;
+        padding: .22rem .62rem !important;
+        font-size: .76rem !important;
         font-weight: 700 !important;
+        line-height: 1.1 !important;
     }
 
     .hc-products-ref .btn.btn-success.btn-sm {
@@ -150,7 +151,18 @@
     .hc-products-ref .hc-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: .42rem;
+        gap: .34rem;
+        align-items: center;
+        min-width: max-content;
+    }
+
+    .hc-products-ref .hc-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: 52px;
+        white-space: nowrap;
     }
 
     .hc-products-ref .hc-deleted-head {
@@ -238,7 +250,6 @@
                             <th>Category</th>
                             <th>12oz Price</th>
                             <th>16oz Price</th>
-                            <th>Quantity</th>
                             <th>Status</th>
                             <th width="200">Actions</th>
                         </tr>
@@ -259,7 +270,6 @@
                             <td><?= htmlspecialchars($item['category_name'] ?? 'Uncategorized') ?></td>
                             <td>&#8369;<?= number_format($price12, 2) ?></td>
                             <td>&#8369;<?= number_format($price16, 2) ?></td>
-                            <td><?= (int)$item['quantity'] ?></td>
                             <td>
                                 <?php if(isset($item['status']) && $item['status'] == 1): ?>
                                     <span class="badge bg-danger">Not Available</span>
@@ -292,7 +302,6 @@
                             <th>Category</th>
                             <th>12oz Price</th>
                             <th>16oz Price</th>
-                            <th>Quantity</th>
                             <th>Status</th>
                             <th>Deleted At</th>
                             <th width="200">Actions</th>
@@ -315,7 +324,6 @@
                                 <td><?= htmlspecialchars($item['category_name'] ?? 'Uncategorized') ?></td>
                                 <td>&#8369;<?= number_format($price12, 2) ?></td>
                                 <td>&#8369;<?= number_format($price16, 2) ?></td>
-                                <td><?= (int)$item['quantity'] ?></td>
                                 <td>
                                     <?php if(isset($item['status']) && $item['status'] == 1): ?>
                                         <span class="badge bg-danger">Not Available</span>
@@ -334,7 +342,7 @@
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9">
+                                <td colspan="8">
                                     <div class="hc-empty-deleted">
                                         <i class="fas fa-box-open"></i>
                                         <span>No deleted products found.</span>

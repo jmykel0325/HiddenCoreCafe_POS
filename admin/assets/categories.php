@@ -94,10 +94,11 @@
     }
 
     .hc-categories-ref .btn.btn-sm {
-        min-height: 34px !important;
-        padding: .3rem .72rem !important;
-        font-size: .8rem !important;
+        min-height: 30px !important;
+        padding: .22rem .62rem !important;
+        font-size: .76rem !important;
         font-weight: 700 !important;
+        line-height: 1.1 !important;
     }
 
     .hc-categories-ref .btn.btn-success.btn-sm {
@@ -120,7 +121,18 @@
     .hc-categories-ref .hc-action-row {
         display: flex;
         flex-wrap: wrap;
-        gap: .42rem;
+        gap: .34rem;
+        align-items: center;
+        min-width: max-content;
+    }
+
+    .hc-categories-ref .hc-action-row .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: 52px;
+        white-space: nowrap;
     }
 
     .hc-categories-ref .hc-empty-state {

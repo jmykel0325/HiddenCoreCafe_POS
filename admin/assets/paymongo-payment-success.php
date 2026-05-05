@@ -25,7 +25,7 @@ $orderData = [
 if (insert('orders', $orderData)) {
     $order_id = mysqli_insert_id($conn);
 
-    // --- Create Order Items and Update Product Stock ---
+    // --- Create Order Items ---
     foreach ($products as $prod) {
         // Get product category
         $product_data = getById('products', $prod['id']);
@@ -43,9 +43,6 @@ if (insert('orders', $orderData)) {
         ];
         insert('order_items', $orderItemData);
 
-        // Update product stock
-        $new_quantity = $product_data['data']['quantity'] - $prod['quantity'];
-        update('products', $prod['id'], ['quantity' => $new_quantity]);
     }
 
     // Clear session data

@@ -31,17 +31,6 @@ if ($currentStatus === 'completed') {
     exit;
 }
 
-if ($currentStatus !== 'cancelled') {
-    $items_query = "SELECT * FROM order_items WHERE order_id = $order_id";
-    $items_result = mysqli_query($conn, $items_query);
-
-    while ($item = mysqli_fetch_assoc($items_result)) {
-        $product_name = mysqli_real_escape_string($conn, $item['product_name']);
-        $quantity = (int)$item['quantity'];
-        mysqli_query($conn, "UPDATE products SET quantity = quantity + $quantity WHERE name = '$product_name'");
-    }
-}
-
 $cancel_query = "UPDATE orders SET order_status = 'cancelled' WHERE id = $order_id LIMIT 1";
 if (mysqli_query($conn, $cancel_query)) {
     header('Location: orders.php?msg=cancelled');

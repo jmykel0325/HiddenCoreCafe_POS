@@ -21,21 +21,25 @@
                 $initials = strtoupper(substr($username, 0, 1));
             }
 
-            $ordersPages = ['orders-create.php', 'orders.php', 'orders-edit.php'];
+            $viewOrdersPages = ['orders.php', 'orders-view.php', 'orders-edit.php'];
             $categoryPages = ['categories-create.php', 'categories.php', 'categories-edit.php'];
             $productPages = ['products-create.php', 'products.php', 'products-edit.php'];
             $cashierPages = ['admins.php', 'admins-edit.php'];
             $salesPages = ['sales-report.php'];
 
-            $isOrdersActive = in_array($currentPage, $ordersPages, true);
             $isCategoryActive = in_array($currentPage, $categoryPages, true);
             $isProductActive = in_array($currentPage, $productPages, true);
             $isCashierActive = in_array($currentPage, $cashierPages, true);
             $isSalesActive = in_array($currentPage, $salesPages, true);
             $isDashboardActive = ($currentPage === 'dashboard.php');
-            $quotaCurrent = 104;
-            $quotaTarget = 150;
-            $quotaPercent = max(0, min(100, (int) round(($quotaCurrent / max(1, $quotaTarget)) * 100)));
+            $quotaCurrent = getTodaySoldCups();
+            $quotaTarget = getTodayQuotaTarget();
+            $quotaPercent = $quotaTarget > 0
+                ? max(0, min(100, (int) round(($quotaCurrent / $quotaTarget) * 100)))
+                : 0;
+            $quotaValueText = $quotaTarget > 0
+                ? ((int) $quotaCurrent . '/' . (int) $quotaTarget)
+                : ((int) $quotaCurrent . '/0');
         ?>
 
         <div class="hc-sidebar-brand">
@@ -56,12 +60,16 @@
             <div class="nav hc-nav">
                 <?php if ($isStaff): ?>
                     <div class="sb-sidenav-menu-heading">Main</div>
-                    <a class="nav-link <?= $isOrdersActive ? 'active' : '' ?>" href="orders-create.php">
-                        <div class="sb-nav-link-icon"><i class="fas fa-cart-plus"></i></div>
-                        Orders
+                    <a class="nav-link <?= $currentPage === 'orders-create.php' ? 'active' : '' ?>" href="orders-create.php">
+                        <div class="sb-nav-link-icon"><i class="fas fa-bag-shopping"></i></div>
+                        Create Order
                     </a>
-                    <a class="nav-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>" href="orders.php">
+                    <a class="nav-link <?= in_array($currentPage, $viewOrdersPages, true) ? 'active' : '' ?>" href="orders.php">
                         <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                        View Orders
+                    </a>
+                    <a class="nav-link <?= $isSalesActive ? 'active' : '' ?>" href="sales-report.php">
+                        <div class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></div>
                         Sales
                     </a>
                 <?php else: ?>
@@ -107,7 +115,7 @@
             <div class="hc-status-label">Quota for today</div>
             <div class="hc-quota-ring">
                 <div class="hc-quota-inner">
-                    <div class="hc-quota-value"><?= (int) $quotaCurrent ?>/<?= (int) $quotaTarget ?></div>
+                    <div class="hc-quota-value"><?= htmlspecialchars($quotaValueText) ?></div>
                     <div class="hc-quota-unit">CUPS</div>
                 </div>
             </div>

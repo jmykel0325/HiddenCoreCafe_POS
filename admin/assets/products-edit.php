@@ -64,17 +64,13 @@
                         <label for=""> Product Name *</label>
                         <input type="text" name="name" required value="<?= $product['data']['name']; ?>"class="form-control" />
                     </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-6 mb-3">
                         <label for="">Price (12oz) *</label>
                         <input type="number" step="0.01" min="0" name="price_12oz" required value="<?= htmlspecialchars($product['data']['price_12oz'] ?? $product['data']['price']);?>" class="form-control" />
                     </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-6 mb-3">
                         <label for="">Price (16oz) *</label>
                         <input type="number" step="0.01" min="0" name="price_16oz" required value="<?= htmlspecialchars($product['data']['price_16oz'] ?? $product['data']['price']);?>" class="form-control" />
-                    </div>
-                <div class="col-md-4 mb-3">
-                        <label for="">Quantity *</label>
-                        <input type="text" name="quantity" required value="<?=$product['data']['quantity'];?>" class="form-control" />
                     </div>
                 <div class="col-md-12 mb-3">
                         <label for="">Image *</label>

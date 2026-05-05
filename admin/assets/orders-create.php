@@ -389,20 +389,15 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                                     $price16 = (float)($item['price_16oz'] ?? $item['price']);
                                 ?>
                                 <div class="hc-product-cell">
-                                    <div class="product-card <?= (int) $item['quantity'] === 0 ? 'out-of-stock' : '' ?>"
+                                    <div class="product-card"
                                          data-id="<?= (int) $item['id'] ?>"
                                          data-name="<?= htmlspecialchars($item['name']) ?>"
                                          data-price12="<?= htmlspecialchars((string)$price12) ?>"
                                          data-price16="<?= htmlspecialchars((string)$price16) ?>"
-                                         data-image="<?= htmlspecialchars($imageUrl) ?>"
-                                         data-quantity="<?= (int) $item['quantity'] ?>"
-                                         <?= (int) $item['quantity'] === 0 ? 'data-disabled="true"' : '' ?>>
+                                         data-image="<?= htmlspecialchars($imageUrl) ?>">
                                         <div class="hc-product-head">
                                             <div class="hc-product-media hc-product-thumb">
                                                 <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-image">
-                                                <?php if ((int) $item['quantity'] === 0): ?>
-                                                    <div class="out-of-stock-overlay">Out of Stock</div>
-                                                <?php endif; ?>
                                             </div>
                                             <div class="product-info">
                                                 <div class="product-name"><?= htmlspecialchars($item['name']) ?></div>
@@ -530,33 +525,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
 
     function updateProductCardQuantities() {
         document.querySelectorAll('.product-card').forEach(function(card) {
-            const id = card.dataset.id;
-            const maxQty = parseInt(card.dataset.quantity);
-            let selectedQty = selectedQtyForProduct(id);
-            let displayQty = maxQty - selectedQty;
-            const qtyElem = card.querySelector('.product-quantity strong');
-            if (qtyElem) qtyElem.textContent = displayQty;
-            card.classList.toggle('is-selected', selectedQty > 0);
-            if (displayQty <= 0) {
-                card.classList.add('out-of-stock');
-                card.setAttribute('data-disabled', 'true');
-                if (!card.querySelector('.out-of-stock-overlay')) {
-                    const media = card.querySelector('.hc-product-media');
-                    const overlay = document.createElement('div');
-                    overlay.className = 'out-of-stock-overlay';
-                    overlay.textContent = 'Out of Stock';
-                    if (media) {
-                        media.appendChild(overlay);
-                    } else {
-                        card.appendChild(overlay);
-                    }
-                }
-            } else {
-                card.classList.remove('out-of-stock');
-                card.removeAttribute('data-disabled');
-                const overlay = card.querySelector('.out-of-stock-overlay');
-                if (overlay) overlay.remove();
-            }
+            card.classList.toggle('is-selected', selectedQtyForProduct(card.dataset.id) > 0);
         });
     }
 
@@ -595,7 +564,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                     <button type="button" class="incdec-btn" data-decrement="${lineKey}" title="Decrease">
                         <svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
                     </button>
-                    <input type="number" min="1" max="${prod.maxQuantity}" value="${prod.quantity}" data-id="${lineKey}" class="form-control text-center" style="width:60px;" readonly>
+                    <input type="number" min="1" value="${prod.quantity}" data-id="${lineKey}" class="form-control text-center" style="width:60px;" readonly>
                     <button type="button" class="incdec-btn" data-increment="${lineKey}" title="Increase">
                         <svg viewBox="0 0 20 20" fill="none"><rect x="9" y="4" width="2" height="12" rx="1" fill="currentColor"/><rect x="4" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
                     </button>
@@ -638,14 +607,9 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                 const lineKey = this.getAttribute('data-increment');
                 const prod = selectedProducts[lineKey];
                 if (!prod) return;
-                const totalSelected = selectedQtyForProduct(prod.id);
-                if (totalSelected < prod.maxQuantity) {
-                    prod.quantity += 1;
-                    document.getElementById('hidden-qty-' + lineKey).value = prod.quantity;
-                    renderSelectedProducts();
-                } else {
-                    showNotif('Cannot add more than available quantity for this product.', '#d9534f');
-                }
+                prod.quantity += 1;
+                document.getElementById('hidden-qty-' + lineKey).value = prod.quantity;
+                renderSelectedProducts();
             });
         });
         document.querySelectorAll('#selectedProducts [data-decrement]').forEach(function(btn) {
@@ -701,28 +665,15 @@ $paymongoEnabled = $paymongoSecretKey !== ''
     }
 
     function addProductToOrder(card, chosenSize = '12oz', qtyToAdd = 1) {
-            if (card.dataset.disabled === 'true') {
-                showNotif('Sorry, this product is currently out of stock.', '#d9534f');
-                return;
-            }
             const id = card.dataset.id;
             const name = card.dataset.name;
             const rawPrice12 = parseFloat(card.dataset.price12);
             const rawPrice16 = parseFloat(card.dataset.price16);
             const price12 = Number.isFinite(rawPrice12) ? rawPrice12 : 0;
             const price16 = Number.isFinite(rawPrice16) ? rawPrice16 : price12;
-            const maxQuantity = parseInt(card.dataset.quantity);
             const image = card.dataset.image || '';
             const lineKey = lineKeyOf(id, chosenSize);
-            let selectedQty = selectedQtyForProduct(id);
-            let availableQty = maxQuantity - selectedQty;
             const requestedQty = Math.max(1, parseInt(qtyToAdd) || 1);
-            if (availableQty <= 0 || requestedQty > availableQty) {
-                card.classList.add('out-of-stock');
-                card.setAttribute('data-disabled', 'true');
-                showNotif('Cannot add more than available stock.', '#d9534f');
-                return;
-            }
             if (selectedProducts[lineKey]) {
                 selectedProducts[lineKey].quantity += requestedQty;
             } else {
@@ -734,7 +685,6 @@ $paymongoEnabled = $paymongoSecretKey !== ''
                     price16: price16,
                     unitPrice: chosenSize === '16oz' ? price16 : price12,
                     quantity: requestedQty,
-                    maxQuantity: maxQuantity,
                     image: image
                 };
             }
@@ -763,8 +713,7 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             incBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const current = parseInt(qtyInput.value) || 1;
-                const max = parseInt(card.dataset.quantity) || 1;
-                qtyInput.value = String(Math.min(max, current + 1));
+                qtyInput.value = String(current + 1);
             });
         }
 
@@ -907,30 +856,6 @@ $paymongoEnabled = $paymongoSecretKey !== ''
             return false;
         }
 
-        for (const lineKey in selectedProducts) {
-            if (selectedProducts[lineKey].quantity > selectedProducts[lineKey].maxQuantity) {
-                showNotif('Selected quantity for ' + selectedProducts[lineKey].name + ' exceeds available stock.', '#d9534f');
-                e.preventDefault();
-                return false;
-            }
-        }
-
-        const productQtyMap = {};
-        for (const lineKey in selectedProducts) {
-            const p = selectedProducts[lineKey];
-            if (!productQtyMap[p.id]) productQtyMap[p.id] = 0;
-            productQtyMap[p.id] += p.quantity;
-        }
-        for (const productId in productQtyMap) {
-            const card = document.querySelector('.product-card[data-id="' + productId + '"');
-            if (!card) continue;
-            const maxQty = parseInt(card.dataset.quantity);
-            if (productQtyMap[productId] > maxQty) {
-                showNotif('Selected quantity exceeds available stock.', '#d9534f');
-                e.preventDefault();
-                return false;
-            }
-        }
     });
 
     renderSelectedProducts();
